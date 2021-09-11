@@ -8,7 +8,14 @@ export interface Ingredient {
 export interface Receipe {
 	name: string;
 	ingredients: Ingredient[];
+	author: Author
 }
+
+export interface Author{
+	displayName: string;
+	photoURL: string;
+	uid: string;
+} 
 
 export interface SavedReceipe extends Receipe {
 	id: string;

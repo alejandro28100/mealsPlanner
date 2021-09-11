@@ -1,12 +1,17 @@
-import { NextPage } from 'next';
-import Link from 'next/link';
-import { withRouter } from 'next/router';
-import { WithRouterProps } from 'next/dist/client/with-router';
 import React, { Fragment, useState } from 'react';
+import { NextPage } from 'next';
+
+import Link from 'next/link';
 import DatePicker from 'components/DatePicker';
-import { addDocument, getDocuments, setDocument } from 'utils/firebase';
+
 import { SavedReceipe } from 'types/index';
+import { WithRouterProps } from 'next/dist/client/with-router';
+
+import { withRouter } from 'next/router';
 import { limit, where } from '@firebase/firestore';
+import { useUser } from "hooks/userUser";
+import { addDocument, getDocuments, setDocument } from 'utils/firebase';
+
 import 'utils/date';
 
 interface MealRecord {
@@ -26,6 +31,11 @@ const MEAL_SUB_OPTIONS: any = {
 };
 
 const AddToMenu: NextPage<WithRouterProps> = (props) => {
+
+	const { user, loading } = useUser({
+		protectedPage: true
+	});
+
 	const { id: receipeID, name: receipeName } = props.router.query;
 
 	const [ mealRecord, setMealRecord ] = useState<MealRecord>({
@@ -58,7 +68,7 @@ const AddToMenu: NextPage<WithRouterProps> = (props) => {
 			/*
 			*	Search for a menu record of the date given and update the document in firestore 
 			*/
-			const snapshot = await getDocuments('menus', where('date', '==', date), limit(1));
+			const snapshot = await getDocuments(`users/${user?.uid}/menus`, where('date', '==', date), limit(1));
 
 			if (snapshot.size >= 1) {
 				snapshot.forEach((doc) => {
@@ -73,16 +83,16 @@ const AddToMenu: NextPage<WithRouterProps> = (props) => {
 						}
 					};
 
-					setDocument(`/menus/${menuID}`, { meals });
+					setDocument(`users/${user?.uid}/menus/${menuID}`, { meals });
 				});
-				console.log('Document updated');
+				// console.log('Document updated');
 				return;
 			}
 
 			/**
-			 * In case there's no  a menu record of the given date, create a new one 
+			 * In case there's no menu record of the given date, create a new one 
 			 */
-			await addDocument('/menus', {
+			await addDocument(`users/${user?.uid}/menus`, {
 				date: mealRecord.date,
 				meals: {
 					[mealRecord.receipeID]: {
@@ -93,10 +103,10 @@ const AddToMenu: NextPage<WithRouterProps> = (props) => {
 				}
 			});
 
-			console.log('Document created');
+			// console.log('Document created');
 			return;
 		}
-		console.info('Fields missing');
+		// console.info('Fields missing');
 	}
 	return (
 		<div>

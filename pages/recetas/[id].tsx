@@ -6,6 +6,8 @@ import { WithRouterProps } from 'next/dist/client/with-router';
 import { withRouter } from 'next/router';
 import { NextPage } from 'next/types';
 import { Ingredient, Receipe } from 'types/index';
+import { useUser } from 'hooks/userUser';
+import { where } from '@firebase/firestore';
 
 interface ReceipeUpdate {
 	name?: string;
@@ -17,9 +19,16 @@ const units = [ 'pieza', 'paquete', 'cucharada', 'litro', 'mililitro', 'gramo', 
 const Receta: NextPage<WithRouterProps> = ({ router }) => {
 	const { id } = router.query;
 
+	const { user, loading: isUserLoading } = useUser({ protectedPage: true });
+
 	const [ receipe, setReceipe ] = useState<Receipe>({
 		ingredients: [],
-		name: ''
+		name: '',
+		author: {
+			displayName: '',
+			photoURL: '',
+			uid:''
+		}
 	});
 	const [ isLoading, setIsLoading ] = useState(true);
 
@@ -53,10 +62,11 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 					console.error(error);
 				}
 			}
-
-			fetchReceipe();
+			if (!isUserLoading) {
+				fetchReceipe();
+			}
 		},
-		[ id ]
+		[ id, isUserLoading, user ]
 	);
 
 	async function updateReceipe(data: ReceipeUpdate) {

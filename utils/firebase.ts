@@ -1,8 +1,7 @@
 import {initializeApp, FirebaseOptions, getApps, getApp, FirebaseApp} from "firebase/app";
 
-// import { getAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore, addDoc, collection,query, doc,setDoc, deleteDoc,getDoc,getDocs,updateDoc, DocumentReference, DocumentSnapshot, DocumentData, QueryConstraint, QuerySnapshot} from "firebase/firestore";
-import "firebase/auth";
 
 const firebaseConfig: FirebaseOptions={
     apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -17,6 +16,8 @@ export const firebaseApp: FirebaseApp = !getApps().length
     : getApp();
 
 export const db = getFirestore(firebaseApp);
+export const auth = getAuth();
+auth.useDeviceLanguage();
 
 
 // Firestore functions

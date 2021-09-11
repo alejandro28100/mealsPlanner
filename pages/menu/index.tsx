@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import DailyView from 'components/Menu/DailyView';
 import MonthView from 'components/Menu/MonthView';
+import { useUser } from 'hooks/userUser';
 
 const Menu = () => {
+	const { user, loading } = useUser({
+		protectedPage: true
+	});
+
 	const [ view, setView ] = useState<'daily' | 'monthly'>('daily');
 	const [ date, setDate ] = useState(new Date().getZeroHours());
 

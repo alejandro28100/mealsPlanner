@@ -1,7 +1,10 @@
 import React, { useState, useEffect, Fragment, FC } from 'react';
 import Link from 'next/link';
 import { deleteField, limit, where } from '@firebase/firestore';
-import { getDocuments, getDocument, setDocument, updateDocument } from 'utils/firebase';
+import { getDocuments, updateDocument } from 'utils/firebase';
+
+import { useUser } from 'hooks/userUser';
+
 import 'utils/date.ts';
 
 interface Menu {
@@ -18,6 +21,8 @@ interface Meal {
 }
 
 const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({ date, setDate }) => {
+	const { user } = useUser();
+
 	const [ days, setDays ] = useState<Date[]>(() => {
 		let current = date;
 		let previous = current.calculateNewDay(-1);
@@ -41,7 +46,11 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({ date, se
 				setLoading(true);
 
 				try {
-					const snapshot = await getDocuments('menus', where('date', '==', getStartingDate()), limit(1));
+					const snapshot = await getDocuments(
+						`users/${user?.uid}/menus`,
+						where('date', '==', getStartingDate()),
+						limit(1)
+					);
 					if (snapshot.docs.length !== 1) {
 						setLoading(false);
 						return;
@@ -94,7 +103,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({ date, se
 	}
 
 	async function handleRemoveMeal(id: string) {
-		const path = `/menus/${menu && menu.id}`;
+		const path = `/menus/${menu?.id}`;
 		const mealPath = `meals.${id}`;
 
 		await updateDocument(path, {
