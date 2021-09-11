@@ -34,7 +34,7 @@ const Home: NextPage = () => {
 			<header>
 				<h1>Food Planner App</h1>
 			</header>
-			<main>
+			<main className="bg-gray-700">
 				<button onClick={handleClick}>Create Account</button>
 				<Link href="/menu">
 					<a>Recetas </a>
