@@ -12,7 +12,7 @@ interface NavbarProps {
 const Navbar: FC<NavbarProps> = ({ end, links }) => {
   const linksCount = Children.count(links);
   return (
-    <header className="flex py-10 px-11 md:px-32">
+    <header className="flex py-5 px-11 md:px-32">
       <div className="flex-1">
         <AiOutlineBook className="w-10 h-10" />
       </div>
