@@ -136,32 +136,30 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
             </div>
           ))}
         </div>
-        <div className="p-10">
+        <div className="p-10 w-full flex items-center justify-center flex-col">
           {!loading ? (
-            <div>
-              {menu && menu.meals.length >= 1 ? (
-                menu.meals.map(({ id, name, type, subType }) => (
-                  <div key={id}>
-                    <h3 style={{ display: "inline-block" }}>
-                      {`${name} | ${type} ${subType && ` | ${subType}`}`}
-                    </h3>
-                    <button onClick={() => handleRemoveMeal(id)}>Eliminar</button>
-                  </div>
-                ))
-              ) : (
-                <Fragment>
-                  <h3 className="text-secondary font-semibold text-xl my-12">
-                    No tienes ninguna comida planeada para este día
+            menu && menu.meals.length >= 1 ? (
+              menu.meals.map(({ id, name, type, subType }) => (
+                <div key={id}>
+                  <h3 style={{ display: "inline-block" }}>
+                    {`${name} | ${type} ${subType && ` | ${subType}`}`}
                   </h3>
-                  <div className="flex flex-col items-center justify-center">
-                    <AddReceipesModal
-                      isOpen={isAddReceipeModalOpen}
-                      toggleOpen={() => setIsAddReceipeModalOpen((prev) => !prev)}
-                    />
-                  </div>
-                </Fragment>
-              )}
-            </div>
+                  <button onClick={() => handleRemoveMeal(id)}>Eliminar</button>
+                </div>
+              ))
+            ) : (
+              <Fragment>
+                <h3 className="text-secondary font-semibold text-xl my-12">
+                  No tienes ninguna comida planeada para este día
+                </h3>
+                <div className="flex flex-col items-center justify-center">
+                  <AddReceipesModal
+                    isOpen={isAddReceipeModalOpen}
+                    toggleOpen={() => setIsAddReceipeModalOpen((prev) => !prev)}
+                  />
+                </div>
+              </Fragment>
+            )
           ) : (
             "Cargando"
           )}
