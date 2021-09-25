@@ -25,7 +25,6 @@ const ReceipesPicker: FC<ReceipesPicker> = ({
 		<>
 			<RadioGroup value={selectedReceipe} onChange={handleSelectReceipe}>
 				<RadioGroup.Label className="sr-only">Receipes</RadioGroup.Label>
-
 				{loading ? (
 					"Cargando recetas..."
 				) : (

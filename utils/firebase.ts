@@ -19,6 +19,8 @@ import {
 	QuerySnapshot,
 } from "firebase/firestore";
 
+import { Meal, MealTime, Receipe, SavedReceipe } from "types/index";
+
 const firebaseConfig: FirebaseOptions = {
 	apiKey: process.env.NEXT_PUBLIC_API_KEY,
 	authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
@@ -43,10 +45,10 @@ auth.useDeviceLanguage();
 export const setDocument = async (
 	path: string,
 	data: { [x: string]: any },
-	merge: boolean = true
+	merge = true
 ): Promise<void> => {
 	const documentReference = doc(db, path);
-	return await setDoc(documentReference, data, { merge: merge });
+	return await setDoc(documentReference, data, { merge });
 };
 
 /**
@@ -90,4 +92,26 @@ export const getDocuments = async (
 	return await getDocs(q);
 };
 
+export interface FirebaseMeal {
+	meals: {
+		[key: string]: any;
+	};
+}
+/**
+ * Turn a meal array to an object with the meals as keys
+ */
+export function toFirestoreMeal(meals: Meal[]) {
+	let mealsObject: FirebaseMeal = { meals: {} };
+
+	meals.forEach(({ id, ...meal }) => {
+		mealsObject["meals"][id] = meal;
+	});
+	return mealsObject;
+}
+/** Turn a receipe into a meal object for firestore */
+export const toMeal = (receipe: SavedReceipe, mealTime: MealTime): Meal => ({
+	id: receipe.id,
+	name: receipe.name,
+	time: mealTime,
+});
 // export const auth = getAuth(firebaseApp);
