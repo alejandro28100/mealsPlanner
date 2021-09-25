@@ -1,23 +1,23 @@
 import React, { useState, useEffect, Fragment, FC } from "react";
 import { deleteField, limit, where } from "@firebase/firestore";
-import { db, getDocuments, updateDocument } from "utils/firebase";
+import {
+	addDocument,
+	getDocuments,
+	toFirestoreMeal,
+	updateDocument,
+	setDocument,
+	FirebaseMeal,
+} from "utils/firebase";
 import { useUser } from "hooks/userUser";
 import { subDays, addDays } from "date-fns";
 import "utils/date.ts";
+import { Meal } from "types/index";
 
 import AddReceipesModal from "components/AddReceipesModal";
-
 interface Menu {
 	id: string;
 	date: Date;
 	meals: Meal[];
-}
-
-interface Meal {
-	id: string;
-	name: string;
-	subType: string;
-	type: string;
 }
 
 type DayOperation = "prev" | "next" | "current";
@@ -30,7 +30,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 	date: currentDay,
 	setDate,
 }) => {
-	const { user } = useUser();
+	const { user, loading: isUserLoading } = useUser();
 
 	const [menu, setMenu] = useState<Menu | undefined>(undefined);
 	const [loading, setLoading] = useState(true);
@@ -40,6 +40,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 
 	useEffect(() => {
 		(async function () {
+			if (isUserLoading && !user) return;
 			function getStartingDate() {
 				return currentDay.getZeroHours();
 			}
@@ -79,7 +80,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 				setLoading(false);
 			}
 		})();
-	}, [currentDay]);
+	}, [currentDay, isUserLoading]);
 
 	function handleShowDay(dayType: DayOperation) {
 		switch (dayType) {
@@ -100,8 +101,46 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 		}
 	}
 
+	async function handleAddMeal(newMeal: Meal) {
+		if (menu) {
+			const formatedMeals: FirebaseMeal = toFirestoreMeal([...menu.meals, newMeal]);
+			const path = `users/${user?.uid}/menus/${menu.id}`;
+			try {
+				//Merge the updated meals field in firestore
+				await setDocument(path, formatedMeals);
+				//Update the state
+				setMenu(
+					(prev) =>
+						({
+							...prev,
+							meals: [...(prev?.meals as Meal[]), newMeal],
+						} as Menu)
+				);
+			} catch (error) {
+				alert("Algo salió mal al añadir una nueva comida");
+				console.log("Algo salió mal al añadir una nueva comida", error);
+			}
+			return;
+		}
+		try {
+			const doc = await addDocument(`users/${user?.uid}/menus`, {
+				date: currentDay.getZeroHours(),
+				...toFirestoreMeal([newMeal]),
+			});
+
+			setMenu({
+				date: currentDay,
+				id: doc.id,
+				meals: [newMeal],
+			} as Menu);
+		} catch (error) {
+			alert("Algo salió mal al crear menú");
+			console.log("Algo salió mal al crear menú", error);
+		}
+	}
+
 	async function handleRemoveMeal(id: string) {
-		const path = `/menus/${menu?.id}`;
+		const path = `users/${user?.uid}/menus/${menu?.id}`;
 		const mealPath = `meals.${id}`;
 
 		await updateDocument(path, {
@@ -136,30 +175,33 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 						</div>
 					))}
 				</div>
-				<div className="p-10 w-full flex items-center justify-center flex-col">
+				<div className="p-10 flex flex-col w-full">
 					{!loading ? (
-						menu && menu.meals.length >= 1 ? (
-							menu.meals.map(({ id, name, type, subType }) => (
-								<div key={id}>
-									<h3 style={{ display: "inline-block" }}>
-										{`${name} | ${type} ${subType && ` | ${subType}`}`}
-									</h3>
-									<button onClick={() => handleRemoveMeal(id)}>Eliminar</button>
-								</div>
-							))
-						) : (
-							<Fragment>
-								<h3 className="text-secondary font-semibold text-xl my-12">
-									No tienes ninguna comida planeada para este día
-								</h3>
-								<div className="flex flex-col items-center justify-center">
-									<AddReceipesModal
-										isOpen={isAddReceipeModalOpen}
-										toggleOpen={() => setIsAddReceipeModalOpen((prev) => !prev)}
-									/>
-								</div>
-							</Fragment>
-						)
+						<Fragment>
+							<div className="self-end">
+								<AddReceipesModal
+									handleAddMeal={handleAddMeal}
+									isOpen={isAddReceipeModalOpen}
+									toggleOpen={() => setIsAddReceipeModalOpen((prev) => !prev)}
+								/>
+							</div>
+							<div className="flex items-center justify-center flex-col h-full">
+								{menu && menu.meals.length >= 1 ? (
+									menu.meals.map(({ id, name, time }) => (
+										<div key={id}>
+											<h3 style={{ display: "inline-block" }}>{`${name} | ${time} `}</h3>
+											<button onClick={() => handleRemoveMeal(id)}>Eliminar</button>
+										</div>
+									))
+								) : (
+									<Fragment>
+										<h3 className="text-secondary font-semibold text-xl my-12">
+											No tienes ninguna comida planeada para este día
+										</h3>
+									</Fragment>
+								)}
+							</div>
+						</Fragment>
 					) : (
 						"Cargando"
 					)}
