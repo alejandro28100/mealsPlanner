@@ -28,7 +28,8 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 			displayName: '',
 			photoURL: '',
 			uid:''
-		}
+		},
+		createdAt: new Date(),
 	});
 	const [ isLoading, setIsLoading ] = useState(true);
 

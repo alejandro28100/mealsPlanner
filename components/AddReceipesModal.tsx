@@ -26,6 +26,10 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({ isOpen, toggleOpen }) => 
 
   const handleFetchNextReceipes = () => getNextReceipes();
 
+  const handleAddReceipeToCalendar = () => {
+    
+  };
+
   const PAGE_SIZE = 5;
 
   async function getNextReceipes() {
@@ -100,18 +104,22 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({ isOpen, toggleOpen }) => 
 
             <div className="">
               <ReceipesPicker
-                receipes={receipes as SavedReceipe[]}
-                handleSelectReceipe={handleSelectReceipe}
-                handleFetchNextReceipes={handleFetchNextReceipes}
-                selectedReceipe={selectedReceipe as SavedReceipe}
-                loading={loadingReceipes && !receipes}
-                loadingNextReceipes={loadingReceipes && (receipes?.length as number) > 0}
-                lastPage={lastReceipesPage}
+                {...{
+                  selectedReceipe: selectedReceipe as SavedReceipe,
+                  receipes: receipes as SavedReceipe[],
+                  handleSelectReceipe,
+                  handleFetchNextReceipes,
+                  loading: loadingReceipes && !receipes,
+                  loadingNextReceipes: loadingReceipes && (receipes?.length as number) > 0,
+                  lastPage: lastReceipesPage,
+                }}
               />
             </div>
 
             <div className="flex items-center justify-end space-x-4">
-              <button className="btn outlined">Cerrar</button>
+              <button onClick={toggleOpen} className="btn outlined">
+                Cerrar
+              </button>
 
               <button className="btn">Agregar comida</button>
             </div>

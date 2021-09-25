@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^1.4.1",
+    "@zach.codes/react-calendar": "^0.3.1",
+    "date-fns": "^2.23.0",
     "firebase": "^9.0.0",
     "nanoid": "^3.1.25",
     "next": "11.1.0",

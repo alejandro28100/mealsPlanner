@@ -1,9 +1,9 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
-import { SavedReceipe, Ingredient } from '../../types';
-import { deleteDocument } from '../../utils/firebase';
-import Link from 'next/link';
-import { withRouter } from 'next/router';
-import { WithRouterProps } from 'next/dist/client/with-router';
+import React, { Dispatch, FC, SetStateAction } from "react";
+import { SavedReceipe, Ingredient } from "../../types";
+import { deleteDocument } from "../../utils/firebase";
+import Link from "next/link";
+import { withRouter } from "next/router";
+import { WithRouterProps } from "next/dist/client/with-router";
 
 interface ReceipeCardProps extends SavedReceipe, WithRouterProps {
 	setReceipes: Dispatch<SetStateAction<SavedReceipe[]>>;
@@ -16,7 +16,7 @@ const ReceipeCard: FC<ReceipeCardProps> = ({ name, id, ingredients, setReceipes,
 			setReceipes((prevReceipes: SavedReceipe[]) => {
 				return prevReceipes.filter((receipe) => receipe.id !== id);
 			});
-			console.log('Receipe deleted');
+			console.log("Receipe deleted");
 		} catch (error) {
 			console.log(error);
 		}
