@@ -243,7 +243,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 					</div>
 				))}
 			</div>
-			<div className="p-10 flex flex-col w-full">
+			<div className="p-10 flex flex-col w-full max-h-[70vh] overflow-y-auto relative">
 				{!loading ? (
 					<Fragment>
 						<div
@@ -268,7 +268,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 								</Fragment>
 							)}
 						</div>
-						<div className="self-end">
+						<div className="fixed bottom-0 right-0 mb-5 mr-10">
 							<AddReceipesModal
 								handleAddMeal={handleAddMeal}
 								isOpen={isAddReceipeModalOpen}
