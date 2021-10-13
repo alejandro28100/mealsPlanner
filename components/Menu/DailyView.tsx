@@ -1,12 +1,10 @@
 import React, { useState, useEffect, Fragment, FC } from "react";
-import { deleteField, limit, where } from "@firebase/firestore";
+import { limit, where } from "@firebase/firestore";
 import {
 	addDocument,
 	getDocuments,
-	toFirestoreMeal,
 	updateDocument,
 	setDocument,
-	FirebaseMeal,
 } from "utils/firebase";
 import { useUser } from "hooks/userUser";
 import { subDays, addDays } from "date-fns";
@@ -17,7 +15,7 @@ import AddReceipesModal from "components/AddReceipesModal";
 interface Menu {
 	id: string;
 	date: Date;
-	meals: Meal[];
+	menuSections: MenuSection[];
 }
 interface MenuSection {
 	menuLabel: MealTime;
@@ -77,21 +75,11 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 					limit(1)
 				);
 				snapshot.forEach((doc) => {
-					let meals: Meal[] = [];
-					let { date, meals: mealsMap } = doc.data();
-
-					Object.keys(mealsMap).forEach((mealID) => {
-						let meal: Meal = {
-							id: mealID,
-							...mealsMap[mealID],
-						};
-						meals.push(meal);
-					});
-					// console.log(toMenuSections(meals));
+					let { date, menuSections } = doc.data();
 					setMenu({
 						id: doc.id,
 						date,
-						meals,
+						menuSections,
 					} as Menu);
 				});
 				setLoading(false);
@@ -124,57 +112,100 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 
 	async function handleAddMeal(newMeal: Meal) {
 		if (menu) {
-			const formatedMeals: FirebaseMeal = toFirestoreMeal([
-				...menu.meals,
-				newMeal,
-			]);
+			// Check wheter the meal already exist on the menu
+			const coincidence = menu.menuSections
+				.find((section) => section.menuLabel === newMeal.time)
+				?.meals.find((meal) => meal.id === newMeal.id);
+			if (coincidence) {
+				return alert("La comida ya está en en el menú 🤔");
+			}
+
+			const updatedSections: MenuSection[] = menu.menuSections.map(
+				(section) => {
+					if (section.menuLabel === newMeal.time) {
+						delete newMeal["time"];
+						section.meals.push(newMeal);
+					}
+					return section;
+				}
+			);
+
 			const path = `users/${user?.uid}/menus/${menu.id}`;
 			try {
 				//Merge the updated meals field in firestore
-				await setDocument(path, formatedMeals);
+				await setDocument(path, { menuSections: updatedSections });
 				//Update the state
 				setMenu(
 					(prev) =>
 						({
 							...prev,
-							meals: [...(prev?.meals as Meal[]), newMeal],
+							menuSections: updatedSections,
 						} as Menu)
 				);
+				alert("Receta Agregada al Menú 📅");
 			} catch (error) {
-				alert("Algo salió mal al añadir una nueva comida");
-				console.log("Algo salió mal al añadir una nueva comida", error);
+				alert("Algo salió mal al añadir una nueva comida 😣");
+				// console.log("Algo salió mal al añadir una nueva comida", error);
 			}
 			return;
 		}
 		try {
+			const mealTimes: MealTime[] = ["breakfast", "lunch", "dinner"];
+			let menuSections: MenuSection[] = mealTimes.map((mealTime) => ({
+				menuLabel: mealTime,
+				meals: [],
+			}));
+
+			menuSections.map((section) => {
+				if (section.menuLabel === newMeal.time) {
+					section.meals.push(newMeal);
+				}
+				return section;
+			});
 			const doc = await addDocument(`users/${user?.uid}/menus`, {
 				date: currentDay.getZeroHours(),
-				...toFirestoreMeal([newMeal]),
+				menuSections,
 			});
 
 			setMenu({
 				date: currentDay,
 				id: doc.id,
-				meals: [newMeal],
+				menuSections,
 			} as Menu);
+
+			alert("Receta Agregada al Menú 📅");
 		} catch (error) {
 			alert("Algo salió mal al crear menú");
-			console.log("Algo salió mal al crear menú", error);
+			// console.log("Algo salió mal al crear menú", error);
 		}
 	}
 
-	async function handleRemoveMeal(id: string) {
+	async function handleRemoveMeal(
+		id: string,
+		mealSection: MealTime,
+		index: number
+	) {
 		const path = `users/${user?.uid}/menus/${menu?.id}`;
-		const mealPath = `meals.${id}`;
 
+		const updatedSections = menu?.menuSections.map((section) => {
+			if (section.menuLabel === mealSection) {
+				const updatedMeals = section.meals.filter((meal, i) => meal.id !== id);
+				return {
+					...section,
+					meals: updatedMeals,
+				};
+			}
+			return section;
+		});
+		// console.log(updatedSections);
 		await updateDocument(path, {
-			[mealPath]: deleteField(),
+			menuSections: updatedSections,
 		});
 
 		setMenu((prev) => {
 			return {
 				...prev,
-				meals: prev && prev.meals.filter((meal) => meal.id !== id),
+				menuSections: updatedSections,
 			} as Menu;
 		});
 	}
@@ -185,10 +216,11 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 		{ type: "next", date: addDays(currentDay, 1) },
 	];
 
-	const menuSections = toMenuSections(menu?.meals as Meal[]);
-	const emptyMenu = isMenuEmpty(menuSections);
+	const emptyMenu = isMenuEmpty(menu?.menuSections as MenuSection[]);
+
 	function isMenuEmpty(menuSections: MenuSection[]): boolean {
 		let isEmpty = true;
+		if (!menuSections) return isEmpty;
 		for (let i = 0; i < menuSections.length; i++) {
 			const menuSection = menuSections[i];
 			if (menuSection.meals.length > 0) {
@@ -220,7 +252,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 							} flex-col h-full`}
 						>
 							{!emptyMenu ? (
-								menuSections.map(({ meals, menuLabel }, index) => (
+								menu?.menuSections.map(({ meals, menuLabel }, index) => (
 									<MealsSection
 										key={`${menuLabel}-${index}`}
 										label={menuLabel}
@@ -264,7 +296,11 @@ const MEAL_SECTION_LABELS = {
 interface MealsSectionProps {
 	meals: Meal[];
 	label: MealTime;
-	handleRemoveMeal: (id: string) => Promise<void>;
+	handleRemoveMeal: (
+		id: string,
+		mealSection: MealTime,
+		index: number
+	) => Promise<void>;
 }
 
 const MealsSection: FC<MealsSectionProps> = ({
@@ -298,7 +334,7 @@ const MealsSection: FC<MealsSectionProps> = ({
 						<button
 							className="p-1 text-sm text-secondary hover:text-red-500"
 							title="Eliminar receta"
-							onClick={() => handleRemoveMeal(id)}
+							onClick={() => handleRemoveMeal(id, label, index)}
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"

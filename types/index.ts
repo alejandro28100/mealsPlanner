@@ -27,5 +27,5 @@ export interface Meal {
 	picture?: string;
 	id: string;
 	name: string;
-	time: MealTime;
+	time?: MealTime;
 }

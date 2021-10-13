@@ -42,9 +42,8 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({
 	const handleAddReceipeToCalendar = async () => {
 		if (selectedReceipe) {
 			let newMeal = toMeal(selectedReceipe, selectedMealTime);
-			console.log(newMeal);
+			// console.log(newMeal);
 			await handleAddMeal(newMeal);
-			alert("Receta Agregada al Menú 📅");
 		}
 	};
 
