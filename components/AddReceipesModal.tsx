@@ -16,16 +16,26 @@ interface AddReceipesModalProps {
 	handleAddMeal: (newMeal: Meal) => Promise<void>;
 }
 
-const AddReceipesModal: FC<AddReceipesModalProps> = ({ isOpen, toggleOpen, handleAddMeal }) => {
+const AddReceipesModal: FC<AddReceipesModalProps> = ({
+	isOpen,
+	toggleOpen,
+	handleAddMeal,
+}) => {
 	const { user, loading: isUserLoading } = useUser();
 
 	const [loadingReceipes, setLoadingReceipes] = useState(true);
 	const [lastReceipesPage, setLastReceipesPage] = useState(false);
-	const [receipes, setReceipes] = useState<SavedReceipe[] | undefined>(undefined);
-	const [selectedReceipe, setSelectedReceipe] = useState<SavedReceipe | undefined>(undefined);
-	const [selectedMealTime, setSelectedMealTime] = useState<MealTime>("breakfast");
+	const [receipes, setReceipes] = useState<SavedReceipe[] | undefined>(
+		undefined
+	);
+	const [selectedReceipe, setSelectedReceipe] = useState<
+		SavedReceipe | undefined
+	>(undefined);
+	const [selectedMealTime, setSelectedMealTime] =
+		useState<MealTime>("breakfast");
 
-	const handleSelectReceipe = (receipe: SavedReceipe) => setSelectedReceipe(receipe);
+	const handleSelectReceipe = (receipe: SavedReceipe) =>
+		setSelectedReceipe(receipe);
 
 	const handleFetchNextReceipes = () => getNextReceipes();
 
@@ -98,14 +108,20 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({ isOpen, toggleOpen, handl
 	return (
 		<Fragment>
 			<button onClick={toggleOpen} className="btn">
-				Agregar comida al calendario
+				Agregar comida 📅
 			</button>
-			<Dialog className="fixed z-10 inset-0 overflow-y-auto" open={isOpen} onClose={toggleOpen}>
+			<Dialog
+				className="fixed z-10 inset-0 overflow-y-auto"
+				open={isOpen}
+				onClose={toggleOpen}
+			>
 				<div className="flex items-center justify-center min-h-screen">
 					<Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
 
 					<div className="relative bg-white rounded max-w-sm mx-auto p-8 space-y-5">
-						<Dialog.Title className="text-xl font-bold ">Agregar comida al calendario</Dialog.Title>
+						<Dialog.Title className="text-xl font-bold ">
+							Agregar comida al calendario 📅
+						</Dialog.Title>
 						<div>
 							<Dialog.Description className="font-semibold">
 								Elige que receta agregar al calendario
@@ -117,7 +133,8 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({ isOpen, toggleOpen, handl
 									handleSelectReceipe,
 									handleFetchNextReceipes,
 									loading: loadingReceipes && !receipes,
-									loadingNextReceipes: loadingReceipes && (receipes?.length as number) > 0,
+									loadingNextReceipes:
+										loadingReceipes && (receipes?.length as number) > 0,
 									lastPage: lastReceipesPage,
 								}}
 							/>
