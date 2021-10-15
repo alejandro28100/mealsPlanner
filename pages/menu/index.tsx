@@ -1,4 +1,11 @@
-import React, { useState, Fragment, FC, useEffect, Dispatch, SetStateAction } from "react";
+import React, {
+	useState,
+	Fragment,
+	FC,
+	useEffect,
+	Dispatch,
+	SetStateAction,
+} from "react";
 import Head from "next/head";
 import { Listbox } from "@headlessui/react";
 
@@ -63,7 +70,9 @@ const Menu = () => {
 	const [view, setView] = useState<CalendarView>("daily");
 	const [date, setDate] = useState(new Date());
 
-	const [currentMonth, setCurrentMonth] = useState<Date>(startOfMonth(new Date()));
+	const [currentMonth, setCurrentMonth] = useState<Date>(
+		startOfMonth(new Date())
+	);
 
 	useEffect(() => {
 		setDate(new Date().getZeroHours());
@@ -78,14 +87,18 @@ const Menu = () => {
 	return (
 		<Fragment>
 			<Head>
-				<title>Mi menú</title>
+				<title>Mi menú 🍽</title>
 			</Head>
 			<Navbar
 				end={
 					!loading &&
 					user && (
 						<div className="w-12 h-w-12">
-							<img className="w-full h-full rounded-full" src={photoURL!} alt={displayName!} />
+							<img
+								className="w-full h-full rounded-full"
+								src={photoURL!}
+								alt={displayName!}
+							/>
 						</div>
 					)
 				}
@@ -186,7 +199,7 @@ const ViewPicker: FC<ViewPicker> = ({ view, setView }) => {
 						<AiFillCaretDown className="w-full h-full" />
 					</span>
 				</Listbox.Button>
-				<Listbox.Options className="absolute right-0 md:left-0 min-w-[200px] py-1 mt-1 overflow-auto bg-white shadow-md max-h-60">
+				<Listbox.Options className="absolute z-10 right-0 md:left-0 min-w-[200px] py-1 mt-1 overflow-auto bg-white shadow-md max-h-60">
 					{views.map(({ value, label, icon }) => (
 						<Listbox.Option
 							className={({ active, selected }) =>
@@ -206,7 +219,9 @@ const ViewPicker: FC<ViewPicker> = ({ view, setView }) => {
 	);
 };
 
-const CustomDay: FC<{ onSelectDay: (date: Date) => void }> = ({ onSelectDay }) => {
+const CustomDay: FC<{ onSelectDay: (date: Date) => void }> = ({
+	onSelectDay,
+}) => {
 	let { locale } = useMonthlyCalendar();
 	let { day } = useMonthlyBody();
 	let dayNumber = format(day, "d", { locale });

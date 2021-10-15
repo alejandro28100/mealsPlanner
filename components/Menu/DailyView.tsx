@@ -243,13 +243,13 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 					</div>
 				))}
 			</div>
-			<div className="p-10 flex flex-col w-full max-h-[70vh] overflow-y-auto relative">
+			<div className="p-10 flex flex-col w-full max-h-[100vh] overflow-y-auto relative">
 				{!loading ? (
 					<Fragment>
 						<div
 							className={`flex items-center ${
 								emptyMenu && "justify-center"
-							} flex-col h-full`}
+							} flex-col h-full pb-10`}
 						>
 							{!emptyMenu ? (
 								menu?.menuSections.map(({ meals, menuLabel }, index) => (
