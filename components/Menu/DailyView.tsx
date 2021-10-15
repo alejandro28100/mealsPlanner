@@ -11,6 +11,7 @@ import { subDays, addDays } from "date-fns";
 import { Meal, MealTime } from "types/index";
 import "utils/date.ts";
 
+import MealsSection from "./MealsSection";
 import AddReceipesModal from "components/AddReceipesModal";
 interface Menu {
 	id: string;
@@ -26,23 +27,6 @@ type DayOperation = "prev" | "next" | "current";
 interface Day {
 	type: DayOperation;
 	date: Date;
-}
-
-function toMenuSections(meals: Meal[]): MenuSection[] {
-	const mealTimes: MealTime[] = ["breakfast", "lunch", "dinner"];
-	let initialValue: MenuSection[] = mealTimes.map((mealTime) => ({
-		menuLabel: mealTime,
-		meals: [],
-	}));
-	if (!meals) return initialValue;
-	return meals.reduce((prev, current) => {
-		return prev.map((menuSection) => {
-			if (menuSection.menuLabel === current.time) {
-				menuSection.meals.push(current);
-			}
-			return menuSection;
-		});
-	}, initialValue);
 }
 
 const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
@@ -284,77 +268,6 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 				{!loading && error && <h2>Algo salió mal, inténtalo más tarde :(</h2>}
 			</div>
 		</section>
-	);
-};
-
-const MEAL_SECTION_LABELS = {
-	breakfast: "Desayuno",
-	lunch: "Comida",
-	dinner: "Cena",
-};
-
-interface MealsSectionProps {
-	meals: Meal[];
-	label: MealTime;
-	handleRemoveMeal: (
-		id: string,
-		mealSection: MealTime,
-		index: number
-	) => Promise<void>;
-}
-
-const MealsSection: FC<MealsSectionProps> = ({
-	label,
-	meals,
-	handleRemoveMeal,
-}) => {
-	const sectionLabel = MEAL_SECTION_LABELS[label];
-	const isEmpty = meals.length === 0;
-
-	if (isEmpty) return null;
-
-	return (
-		<div className="my-5 self-start justify-self-star w-full">
-			<h3 className="my-4 py-1 border-b border-secondary/60 font-semibold">
-				{sectionLabel}
-			</h3>
-			<div className="flex flex-wrap">
-				{meals.map(({ id, name }, index) => (
-					<div
-						className="flex border border-secondary/60 m-4"
-						key={`${sectionLabel}-${id}-${index}`}
-					>
-						<h4
-							title="Ver receta"
-							className="px-2 py-1 hover:bg-secondary/30 cursor-pointer"
-						>
-							{name}
-						</h4>
-						<hr className="border-r border-secondary/60 h-full" />
-						<button
-							className="p-1 text-sm text-secondary hover:text-red-500"
-							title="Eliminar receta"
-							onClick={() => handleRemoveMeal(id, label, index)}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								className="h-4 w-4"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
-						</button>
-					</div>
-				))}
-			</div>
-		</div>
 	);
 };
 

@@ -1,23 +1,23 @@
 @tailwind base;
 @tailwind components;
 
-@layer components{
-    .btn{
-        @apply py-2 px-4 font-semibold rounded-md shadow-md text-white bg-black hover:bg-black/80; 
-    }
-    .btn.outlined{
-        @apply border border-black text-black bg-white hover:bg-black/10;
-    }
-    .btn.secondary{
-        @apply bg-secondary hover:bg-secondary/80 ;
-    }
+@layer components {
+	.btn {
+		@apply text-sm md:text-base py-2 px-4 font-semibold rounded-md text-white bg-black hover:bg-black/80;
+	}
+	.btn.outlined {
+		@apply border border-black text-black bg-white hover:bg-black/10;
+	}
+	.btn.secondary {
+		@apply bg-secondary hover:bg-secondary/80;
+	}
 
-    .react-datepicker{
-        @apply w-full;
-    }
-    .react-datepicker__navigation--previous{
-        @apply hidden;
-    }
+	.react-datepicker {
+		@apply w-full;
+	}
+	.react-datepicker__navigation--previous {
+		@apply hidden;
+	}
 }
 
 @tailwind utilities;
