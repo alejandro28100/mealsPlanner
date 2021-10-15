@@ -9,7 +9,13 @@ interface ReceipeCardProps extends SavedReceipe, WithRouterProps {
 	setReceipes: Dispatch<SetStateAction<SavedReceipe[]>>;
 }
 
-const ReceipeCard: FC<ReceipeCardProps> = ({ name, id, ingredients, setReceipes, router }) => {
+const ReceipeCard: FC<ReceipeCardProps> = ({
+	name,
+	id,
+	ingredients,
+	setReceipes,
+	router,
+}) => {
 	async function deleteReceipe(id: string) {
 		try {
 			await deleteDocument(`receipes/${id}`);
@@ -44,11 +50,11 @@ const ReceipeCard: FC<ReceipeCardProps> = ({ name, id, ingredients, setReceipes,
 					))}
 				</tbody>
 			</table>
-			<Link href={`/menu/anadir/${id}?name=${name}`}>
+			<Link href={`/menu/anadir/${id}?name=${name}`} passHref>
 				<button>Añadir Receta Al Menú</button>
 			</Link>
 			<button onClick={() => deleteReceipe(id)}>Eliminar Receta</button>
-			<Link href={`/recetas/${id}`}>
+			<Link href={`/recetas/${id}`} passHref>
 				<button>Editar Receta</button>
 			</Link>
 		</div>

@@ -102,7 +102,7 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({
 	useEffect(() => {
 		if (isUserLoading && !isOpen) return;
 		getReceipes();
-	}, [isUserLoading, isOpen]);
+	}, [isUserLoading, isOpen, getReceipes]);
 
 	return (
 		<Fragment>

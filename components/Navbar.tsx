@@ -20,7 +20,7 @@ const Navbar: FC<NavbarProps> = ({ end, links }) => {
 				<nav className="flex items-center justify-end mx-5">
 					<ul className="flex space-x-4">
 						{Children.map(links, (link, idx) => (
-							<NavbarLink key={idx} children={link} />
+							<NavbarLink key={idx}>{link}</NavbarLink>
 						))}
 					</ul>
 				</nav>

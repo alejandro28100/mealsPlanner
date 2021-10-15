@@ -73,7 +73,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 				setLoading(false);
 			}
 		})();
-	}, [currentDay, isUserLoading]);
+	}, [currentDay, isUserLoading, user]);
 
 	function handleShowDay(dayType: DayOperation) {
 		switch (dayType) {
