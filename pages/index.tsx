@@ -44,7 +44,7 @@ const Home: NextPage = () => {
 							onClick={handleSignUp}
 							className="btn flex items-center justify-center"
 						>
-							Iniciar con Google <FcGoogle className="mx-2" />
+							Iniciar sesión con Google <FcGoogle className="mx-2" />
 						</button>
 					)
 				}
@@ -79,7 +79,10 @@ const Home: NextPage = () => {
 							</Link>
 						</div>
 					) : (
-						<button className="btn self-start text-lg px-6 py-2">
+						<button
+							onClick={handleSignUp}
+							className="btn self-start text-lg px-6 py-2"
+						>
 							¡Pruébalo Hoy!
 						</button>
 					)}
