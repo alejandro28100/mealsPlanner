@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { NextPage } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { SavedReceipe, Receipe } from "types/index";
 import ReceipeCard from "components/Receipe/ReceipeCard";
 import { addDocument, getDocuments } from "utils/firebase";
@@ -9,6 +10,7 @@ import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { useUser } from "hooks/userUser";
 import { orderBy, serverTimestamp, where } from "@firebase/firestore";
+import Navbar from "components/Navbar";
 
 const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 	const { user, loading } = useUser({
@@ -58,21 +60,41 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 		const documentID = snapshot.id;
 		router.push(`/recetas/${documentID}`);
 	}
+	function renderReceipes() {
+		if (loadingReceipes) {
+			return <p className="text-center">Cargando Recetas... </p>;
+		}
+		if (receipes?.length > 0) {
+			return receipes.map((receipe) => (
+				<ReceipeCard key={receipe.id} {...{ ...receipe, setReceipes }} />
+			));
+		}
 
+		return <p className="text-center">No tienes ninguna receta 😣</p>;
+	}
 	return (
 		<div>
 			<Head>
 				<title>Recetas</title>
 			</Head>
-			<h1>Mis recetas</h1>
-			<button onClick={createReceipe}>Añadir nueva receta</button>
-			<div>
-				{!loadingReceipes && receipes?.length > 0
-					? receipes.map((receipe) => (
-							<ReceipeCard key={receipe.id} {...{ ...receipe, setReceipes }} />
-					  ))
-					: "Parece que no tienes recetas"}
-			</div>
+			<Navbar
+				start={<h1 className="text-lg font-semibold">Mis recetas</h1>}
+				links={[
+					<Link href="/menu">
+						<a className="btn outlined">Ver menú 📅</a>
+					</Link>,
+				]}
+			/>
+			<main className="px-11 md:px-32 relative h-[85vh] overflow-y-auto">
+				<section className="my-4">
+					<div className="space-y-8">{renderReceipes()}</div>
+					<div className="absolute bottom-0 right-0 mx-11">
+						<button className="btn" onClick={createReceipe}>
+							Añadir nueva receta 🍽
+						</button>
+					</div>
+				</section>
+			</main>
 			{/* <pre>{JSON.stringify(receipes, null, 2)}</pre> */}
 		</div>
 	);

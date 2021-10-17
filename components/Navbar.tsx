@@ -3,21 +3,25 @@ import React, { ReactNode, FC, Children } from "react";
 import { AiOutlineBook } from "react-icons/ai";
 
 interface NavbarProps {
+	/** Element at the start of the navbar */
+	start?: ReactNode;
 	/** Element at the end of the navbar */
 	end?: ReactNode;
-	/** List of links  */
+	/** An array of links  */
 	links?: ReactNode[] | false | null;
 }
 
-const Navbar: FC<NavbarProps> = ({ end, links }) => {
+const Navbar: FC<NavbarProps> = ({ start, end, links }) => {
 	const linksCount = Children.count(links);
 	return (
-		<header className="flex py-5 px-11 md:px-32">
-			<div className="flex-1">
+		<header className="flex items-center py-5 px-11 md:px-32">
+			<div className={`${start ? "" : "flex-1"}`}>
 				<AiOutlineBook className="w-10 h-10" />
 			</div>
+			{start && <div className="mx-4 flex-1">{start}</div>}
+
 			{linksCount > 0 && (
-				<nav className="flex items-center justify-end mx-5">
+				<nav className="flex items-center justify-end ml-5">
 					<ul className="flex space-x-4">
 						{Children.map(links, (link, idx) => (
 							<NavbarLink key={idx}>{link}</NavbarLink>
