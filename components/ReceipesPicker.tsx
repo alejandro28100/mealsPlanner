@@ -35,17 +35,11 @@ const ReceipesPicker: FC<ReceipesPicker> = ({
 								<RadioGroup.Option
 									key={id}
 									value={receipe}
-									className={({ active, checked }) =>
-										`${active && "ring-black ring-1"} 
-                    ${
-											checked
-												? "bg-black text-white"
-												: "hover:bg-black/80 hover:border-black/80 hover:text-white"
-										} 
-                    bg-white border-black border rounded px-4 py-2 cursor-pointer select-none
-                    
-                    `
-									}
+									className={({ active, checked }) => `
+										${active ? "ring-black/80 ring-1" : ""} 
+										${checked ? "bg-black text-white" : "bg-white"} 
+										 bg-white border-black border rounded px-4 py-2 cursor-pointer select-none 
+							}		`}
 								>
 									<div className="flex items-center justify-btween w-full">
 										<RadioGroup.Label as="p" className="font-medium text-sm">
@@ -60,7 +54,10 @@ const ReceipesPicker: FC<ReceipesPicker> = ({
 			</RadioGroup>
 			{!lastPage && (
 				<div className="">
-					<button disabled={loadingNextReceipes} onClick={handleFetchNextReceipes}>
+					<button
+						disabled={loadingNextReceipes}
+						onClick={handleFetchNextReceipes}
+					>
 						Ver más recetas
 					</button>
 				</div>

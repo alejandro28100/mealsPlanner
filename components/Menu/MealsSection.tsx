@@ -103,7 +103,7 @@ const MealsSection: FC<MealsSectionProps> = ({
 				<div className="flex items-center justify-center min-h-screen">
 					<Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
 
-					<div className="relative flex flex-col bg-white rounded w-[90vw] h-[50vh] mx-auto p-8 space-y-5 overflow-y-auto">
+					<div className="relative flex flex-col bg-white rounded w-[90vw] sm:w-[60vw] md:w-[50vw] lg:w-[30vw] h-[50vh] mx-auto p-8 space-y-5 overflow-y-auto">
 						{selectedReceipe && (
 							<Fragment>
 								<Dialog.Title className="text-xl font-bold">

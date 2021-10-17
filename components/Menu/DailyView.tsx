@@ -252,7 +252,7 @@ const DailyView: FC<{ date: Date; setDate: (date: Date) => void }> = ({
 								</Fragment>
 							)}
 						</div>
-						<div className="fixed bottom-0 right-0 mb-5 mr-10">
+						<div className="fixed bottom-0 right-0 mb-5 mr-11 md:mr-32">
 							<AddReceipesModal
 								handleAddMeal={handleAddMeal}
 								isOpen={isAddReceipeModalOpen}

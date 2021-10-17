@@ -6,7 +6,7 @@ import { Listbox } from "@headlessui/react";
 
 import { MealTime } from "types/index";
 
-const MEAL_TIME_OPTIONS: MealTime[] = ["breakfast", "lunch","dinner" ];
+const MEAL_TIME_OPTIONS: MealTime[] = ["breakfast", "lunch", "dinner"];
 
 const MEAL_TIME_LABELS = {
 	breakfast: "Desayuno",
@@ -19,12 +19,17 @@ interface MealTimeSelect {
 	setSelectedMealTime: Dispatch<SetStateAction<MealTime>>;
 }
 
-const MealTimeSelect: FC<MealTimeSelect> = ({ selectedMealTime, setSelectedMealTime }) => {
+const MealTimeSelect: FC<MealTimeSelect> = ({
+	selectedMealTime,
+	setSelectedMealTime,
+}) => {
 	return (
 		<Listbox value={selectedMealTime} onChange={setSelectedMealTime}>
 			<div className="relative mt-1 ">
 				<div className="flex space-x-2 items-center">
-					<Listbox.Label className="font-semibold">Tipo de comida:</Listbox.Label>
+					<Listbox.Label className="font-semibold">
+						Tipo de comida:
+					</Listbox.Label>
 					<Listbox.Button className="rounded border border-black py-1 px-4 text-sm flex flex-row items-center justify-between md:text-base flex-1">
 						{MEAL_TIME_LABELS[selectedMealTime]}
 						<span className="h-4">
