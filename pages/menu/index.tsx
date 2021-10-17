@@ -7,6 +7,8 @@ import React, {
 	SetStateAction,
 } from "react";
 import Head from "next/head";
+import Link from "next/link";
+
 import { Listbox } from "@headlessui/react";
 
 import {
@@ -90,6 +92,7 @@ const Menu = () => {
 				<title>Mi menú 🍽</title>
 			</Head>
 			<Navbar
+				links={[<Link href="/recetas">Ver recetas</Link>]}
 				end={
 					!loading &&
 					user && (
