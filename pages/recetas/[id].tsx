@@ -298,20 +298,19 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 											</button>
 										</td>
 									</tr>
-									{receipe &&
-										receipe.ingredients.map((ingredient: Ingredient) => (
-											<ReceipeIngredientRow
-												{...{
-													...ingredient,
-													ingredientEdited,
-													handleEditIngredient,
-													handleRemoveIngredient,
-													handleUpdateIngredient,
-													setIngredientEdited,
-													key: ingredient.id,
-												}}
-											/>
-										))}
+									{receipe?.ingredients.map((ingredient: Ingredient) => (
+										<ReceipeIngredientRow
+											key={ingredient.id}
+											{...{
+												...ingredient,
+												ingredientEdited,
+												handleEditIngredient,
+												handleRemoveIngredient,
+												handleUpdateIngredient,
+												setIngredientEdited,
+											}}
+										/>
+									))}
 								</table>
 							</Fragment>
 						)}
