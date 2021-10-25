@@ -187,10 +187,10 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 					/>
 				}
 				links={[
-					<Link href="/menu">
+					<Link key="link-1" href="/menu">
 						<a className="hidden md:inline-block">Ver Menú 📅</a>
 					</Link>,
-					<Link href="/menu">
+					<Link key="link-2" href="/menu">
 						<a className="hidden md:inline-block">Ver Recetas 🍽</a>
 					</Link>,
 				]}
