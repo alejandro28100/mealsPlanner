@@ -1,7 +1,14 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, {
+	FC,
+	Fragment,
+	useEffect,
+	useState,
+	Dispatch,
+	SetStateAction,
+} from "react";
 
 import Navbar from "components/Navbar";
-import Link from "next/Link";
+import Link from "next/link";
 
 import { nanoid } from "nanoid";
 import { getDocument, updateDocument } from "utils/firebase";
@@ -273,151 +280,176 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 									</td>
 								</tr>
 								{receipe &&
-									receipe.ingredients.map(
-										({ name, amount, unit, id }: Ingredient) => (
-											<tr className="flex justify-between" key={id}>
-												<td className="w-1/4">
-													{ingredientEdited.id === id ? (
-														<input
-															className="border border-secondary rounded-sm"
-															type="text"
-															value={ingredientEdited.name}
-															onChange={(e) =>
-																setIngredientEdited((prev) => ({
-																	...prev,
-																	name: e.target.value,
-																}))
-															}
-														/>
-													) : (
-														name
-													)}
-												</td>
-												<td
-													className="w-1/4"
-													colSpan={ingredientEdited.id === id ? 1 : 2}
-												>
-													{ingredientEdited.id === id ? (
-														<input
-															className="border border-secondary rounded-sm"
-															type="text"
-															value={ingredientEdited.amount}
-															onChange={(e) =>
-																setIngredientEdited((prev) => ({
-																	...prev,
-																	amount: e.target.value,
-																}))
-															}
-														/>
-													) : (
-														`${amount} ${unit}`
-													)}
-												</td>
-
-												{ingredientEdited.id === id ? (
-													<td className="w-1/4">
-														<select
-															className="border border-secondary rounded-sm"
-															disabled={saving}
-															value={ingredientEdited.unit}
-															onChange={(e) =>
-																setIngredientEdited((prev) => ({
-																	...prev,
-																	unit: e.target.value,
-																}))
-															}
-														>
-															{units.map((unit) => (
-																<option
-																	key={`editede-ingredient-unit-option-${unit}`}
-																	value={unit}
-																>
-																	{unit}
-																</option>
-															))}
-														</select>
-													</td>
-												) : (
-													<td className="w-1/4"></td>
-												)}
-
-												<td className="space-x-5 w-1/4">
-													<button
-														disabled={
-															!!ingredientEdited.id &&
-															ingredientEdited.id !== id
-														}
-														onClick={() => {
-															if (ingredientEdited.id !== id) {
-																return handleEditIngredient({
-																	name,
-																	amount,
-																	unit,
-																	id,
-																});
-															}
-															handleUpdateIngredient();
-														}}
-													>
-														{ingredientEdited.id !== id ? (
-															<svg
-																xmlns="http://www.w3.org/2000/svg"
-																className="h-4 w-4"
-																fill="none"
-																viewBox="0 0 24 24"
-																stroke="currentColor"
-															>
-																<path
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																	strokeWidth={2}
-																	d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-																/>
-															</svg>
-														) : (
-															<svg
-																xmlns="http://www.w3.org/2000/svg"
-																className="h-4 w-4"
-																fill="none"
-																viewBox="0 0 24 24"
-																stroke="currentColor"
-															>
-																<path
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																	strokeWidth={2}
-																	d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-																/>
-															</svg>
-														)}
-													</button>
-													<button onClick={() => handleRemoveIngredient(id)}>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															className="h-4 w-4"
-															fill="none"
-															viewBox="0 0 24 24"
-															stroke="currentColor"
-														>
-															<path
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth={2}
-																d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-															/>
-														</svg>
-													</button>
-												</td>
-											</tr>
-										)
-									)}
+									receipe.ingredients.map((ingredient: Ingredient) => (
+										<ReceipeIngredientRow
+											{...{
+												...ingredient,
+												ingredientEdited,
+												handleEditIngredient,
+												handleRemoveIngredient,
+												handleUpdateIngredient,
+												setIngredientEdited,
+												key: ingredient.id,
+											}}
+										/>
+									))}
 							</table>
-							{/* <pre>{JSON.stringify(receipe, null, 2)}</pre> */}
 						</Fragment>
 					)}
 				</section>
 			</main>
 		</Fragment>
+	);
+};
+
+interface ReceipeIngredientRowProps extends Ingredient {
+	ingredientEdited: Ingredient;
+	setIngredientEdited: Dispatch<SetStateAction<Ingredient>>;
+	handleRemoveIngredient: (id: string) => Promise<void>;
+	handleEditIngredient: (ingredient: Ingredient) => void;
+	handleUpdateIngredient: () => Promise<void>;
+}
+
+const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
+	id,
+	amount,
+	unit,
+	name,
+	ingredientEdited,
+	setIngredientEdited,
+	handleRemoveIngredient,
+	handleEditIngredient,
+	handleUpdateIngredient,
+}) => {
+	return (
+		<tr className="flex justify-between" key={id}>
+			<td className="w-1/4">
+				{ingredientEdited.id === id ? (
+					<input
+						className="border border-secondary rounded-sm"
+						type="text"
+						value={ingredientEdited.name}
+						onChange={(e) =>
+							setIngredientEdited((prev) => ({
+								...prev,
+								name: e.target.value,
+							}))
+						}
+					/>
+				) : (
+					name
+				)}
+			</td>
+			<td className="w-1/4" colSpan={ingredientEdited.id === id ? 1 : 2}>
+				{ingredientEdited.id === id ? (
+					<input
+						className="border border-secondary rounded-sm"
+						type="text"
+						value={ingredientEdited.amount}
+						onChange={(e) =>
+							setIngredientEdited((prev) => ({
+								...prev,
+								amount: e.target.value,
+							}))
+						}
+					/>
+				) : (
+					`${amount} ${unit}`
+				)}
+			</td>
+
+			{ingredientEdited.id === id ? (
+				<td className="w-1/4">
+					<select
+						className="border border-secondary rounded-sm"
+						// disabled={saving}
+						value={ingredientEdited.unit}
+						onChange={(e) =>
+							setIngredientEdited((prev) => ({
+								...prev,
+								unit: e.target.value,
+							}))
+						}
+					>
+						{units.map((unit) => (
+							<option
+								key={`editede-ingredient-unit-option-${unit}`}
+								value={unit}
+							>
+								{unit}
+							</option>
+						))}
+					</select>
+				</td>
+			) : (
+				<td className="w-1/4"></td>
+			)}
+
+			<td className="space-x-5 w-1/4">
+				<button
+					disabled={!!ingredientEdited.id && ingredientEdited.id !== id}
+					onClick={() => {
+						if (ingredientEdited.id !== id) {
+							return handleEditIngredient({
+								name,
+								amount,
+								unit,
+								id,
+							});
+						}
+						handleUpdateIngredient();
+					}}
+				>
+					{ingredientEdited.id !== id ? (
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+							/>
+						</svg>
+					) : (
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+							/>
+						</svg>
+					)}
+				</button>
+				<button onClick={() => handleRemoveIngredient(id)}>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						className="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+						/>
+					</svg>
+				</button>
+			</td>
+		</tr>
 	);
 };
 
