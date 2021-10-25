@@ -205,97 +205,117 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 						<a>Ver Recetas 🍽</a>
 					</Link>
 				</nav>
-				<section className="space-y-5">
-					{isLoading ? (
-						<h1 className="text-secondary">Cargando Receta...</h1>
-					) : (
-						<Fragment>
-							<h2 className="font-semibold text-lg">Ingredientes</h2>
+				<section className="space-y-5 flex flex-col lg:flex-row">
+					<div className="w-5/12">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-full w-full"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+							/>
+						</svg>
+					</div>
+					<div className="w-auto">
+						{isLoading ? (
+							<h1 className="text-secondary">Cargando Receta...</h1>
+						) : (
+							<Fragment>
+								<h2 className="font-semibold text-lg">Ingredientes</h2>
 
-							<table className="flex space-y-5 flex-col">
-								<thead>
-									<tr className="flex justify-between text-secondary border-b border-secondary">
-										<th className="w-1/4 font-semibold text-left">Nombre</th>
-										<th className="w-1/4 font-semibold text-left">Cantidad</th>
-										<th className="w-1/4 font-semibold text-left">Unidad</th>
-										<th className="w-1/4"></th>
+								<table className="flex space-y-5 flex-col">
+									<thead>
+										<tr className="flex justify-between text-secondary border-b border-secondary">
+											<th className="w-1/4 font-semibold text-left">Nombre</th>
+											<th className="w-1/4 mx-4 font-semibold text-left">
+												Cantidad
+											</th>
+											<th className="w-1/4 font-semibold text-left">Unidad</th>
+											<th className="w-1/4"></th>
+										</tr>
+									</thead>
+									<tr className="flex items-center justify-between">
+										<td className="w-1/4">
+											<input
+												className="w-full border border-secondary rounded-sm"
+												type="text"
+												disabled={saving}
+												value={newIngredient.name}
+												onChange={(e) =>
+													setNewIngredient({
+														...newIngredient,
+														name: e.target.value,
+													})
+												}
+											/>
+										</td>
+										<td className="w-1/4 mx-4">
+											<input
+												className="w-full border border-secondary rounded-sm"
+												disabled={saving}
+												type="text"
+												value={newIngredient.amount}
+												onChange={(e) =>
+													setNewIngredient({
+														...newIngredient,
+														amount: e.target.value,
+													})
+												}
+											/>
+										</td>
+										<td className="w-1/4">
+											<select
+												className="w-2/3 border border-secondary rounded-sm"
+												disabled={saving}
+												value={newIngredient.unit}
+												onChange={(e) => {
+													setNewIngredient({
+														...newIngredient,
+														unit: e.target.value,
+													});
+												}}
+											>
+												{units.map((unit) => (
+													<option key={`unit-option-${unit}`} value={unit}>
+														{unit}
+													</option>
+												))}
+											</select>
+										</td>
+										<td className="w-1/4">
+											<button
+												className="text-sm px-2 py-1 border border-secondary rounded"
+												disabled={saving}
+												onClick={handleAddIngredient}
+											>
+												Agregar Ingrediente
+											</button>
+										</td>
 									</tr>
-								</thead>
-								<tr className="flex justify-between">
-									<td className="w-1/4">
-										<input
-											className="border border-secondary rounded-sm"
-											type="text"
-											disabled={saving}
-											value={newIngredient.name}
-											onChange={(e) =>
-												setNewIngredient({
-													...newIngredient,
-													name: e.target.value,
-												})
-											}
-										/>
-									</td>
-									<td className="w-1/4">
-										<input
-											className="border border-secondary rounded-sm"
-											disabled={saving}
-											type="text"
-											value={newIngredient.amount}
-											onChange={(e) =>
-												setNewIngredient({
-													...newIngredient,
-													amount: e.target.value,
-												})
-											}
-										/>
-									</td>
-									<td className="w-1/4">
-										<select
-											className="border border-secondary rounded-sm"
-											disabled={saving}
-											value={newIngredient.unit}
-											onChange={(e) => {
-												setNewIngredient({
-													...newIngredient,
-													unit: e.target.value,
-												});
-											}}
-										>
-											{units.map((unit) => (
-												<option key={`unit-option-${unit}`} value={unit}>
-													{unit}
-												</option>
-											))}
-										</select>
-									</td>
-									<td className="w-1/4">
-										<button
-											className="text-sm px-2 py-1 border border-secondary rounded"
-											disabled={saving}
-											onClick={handleAddIngredient}
-										>
-											Agregar Ingrediente
-										</button>
-									</td>
-								</tr>
-								{receipe &&
-									receipe.ingredients.map((ingredient: Ingredient) => (
-										<ReceipeIngredientRow
-											{...{
-												...ingredient,
-												ingredientEdited,
-												handleEditIngredient,
-												handleRemoveIngredient,
-												handleUpdateIngredient,
-												setIngredientEdited,
-												key: ingredient.id,
-											}}
-										/>
-									))}
-							</table>
-						</Fragment>
-					)}
+									{receipe &&
+										receipe.ingredients.map((ingredient: Ingredient) => (
+											<ReceipeIngredientRow
+												{...{
+													...ingredient,
+													ingredientEdited,
+													handleEditIngredient,
+													handleRemoveIngredient,
+													handleUpdateIngredient,
+													setIngredientEdited,
+													key: ingredient.id,
+												}}
+											/>
+										))}
+								</table>
+							</Fragment>
+						)}
+					</div>
 				</section>
 			</main>
 		</Fragment>
@@ -326,7 +346,7 @@ const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
 			<td className="w-1/4">
 				{ingredientEdited.id === id ? (
 					<input
-						className="border border-secondary rounded-sm"
+						className="w-full border border-secondary rounded-sm"
 						type="text"
 						value={ingredientEdited.name}
 						onChange={(e) =>
@@ -340,10 +360,10 @@ const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
 					name
 				)}
 			</td>
-			<td className="w-1/4" colSpan={ingredientEdited.id === id ? 1 : 2}>
+			<td className="w-1/4 mx-4" colSpan={ingredientEdited.id === id ? 1 : 2}>
 				{ingredientEdited.id === id ? (
 					<input
-						className="border border-secondary rounded-sm"
+						className="w-full border border-secondary rounded-sm"
 						type="text"
 						value={ingredientEdited.amount}
 						onChange={(e) =>
@@ -362,7 +382,6 @@ const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
 				<td className="w-1/4">
 					<select
 						className="border border-secondary rounded-sm"
-						// disabled={saving}
 						value={ingredientEdited.unit}
 						onChange={(e) =>
 							setIngredientEdited((prev) => ({
@@ -385,7 +404,7 @@ const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
 				<td className="w-1/4"></td>
 			)}
 
-			<td className="space-x-5 w-1/4">
+			<td className="space-x-5 w-1/4 text-right">
 				<button
 					disabled={!!ingredientEdited.id && ingredientEdited.id !== id}
 					onClick={() => {
