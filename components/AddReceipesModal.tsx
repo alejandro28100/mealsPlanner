@@ -81,6 +81,7 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({
 	}
 
 	async function getReceipes() {
+		if (isUserLoading && !isOpen) return;
 		const snapshot = await getDocuments(
 			"receipes",
 			where("author.uid", "==", user?.uid),
@@ -100,9 +101,8 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({
 	}
 
 	useEffect(() => {
-		if (isUserLoading && !isOpen) return;
 		getReceipes();
-	}, [isUserLoading, isOpen, getReceipes]);
+	}, [user]);
 
 	return (
 		<Fragment>

@@ -92,7 +92,11 @@ const Menu = () => {
 				<title>Mi menú 🍽</title>
 			</Head>
 			<Navbar
-				links={[<Link href="/recetas">Ver recetas</Link>]}
+				links={[
+					<Link key="link" href="/recetas">
+						Ver recetas
+					</Link>,
+				]}
 				end={
 					!loading &&
 					user && (

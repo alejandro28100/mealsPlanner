@@ -80,7 +80,7 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 			<Navbar
 				start={<h1 className="text-lg font-semibold">Mis recetas</h1>}
 				links={[
-					<Link href="/menu">
+					<Link key="link" href="/menu">
 						<a className="btn outlined">Ver menú 📅</a>
 					</Link>,
 				]}
