@@ -1,4 +1,10 @@
-import { initializeApp, FirebaseOptions, getApps, getApp, FirebaseApp } from "firebase/app";
+import {
+	initializeApp,
+	FirebaseOptions,
+	getApps,
+	getApp,
+	FirebaseApp,
+} from "firebase/app";
 
 import { getAuth } from "firebase/auth";
 import {
@@ -18,6 +24,7 @@ import {
 	QueryConstraint,
 	QuerySnapshot,
 } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 import { Meal, MealTime, Receipe, SavedReceipe } from "types/index";
 
@@ -34,7 +41,8 @@ export const firebaseApp: FirebaseApp = !getApps().length
 	: getApp();
 
 export const db = getFirestore(firebaseApp);
-export const auth = getAuth();
+export const auth = getAuth(firebaseApp);
+export const storage = getStorage(firebaseApp);
 auth.useDeviceLanguage();
 
 // Firestore functions
@@ -64,7 +72,10 @@ export const addDocument = async (
 
 /** Update a firestore document refered by its path */
 
-export const updateDocument = async (path: string, data: { [x: string]: any }): Promise<void> => {
+export const updateDocument = async (
+	path: string,
+	data: { [x: string]: any }
+): Promise<void> => {
 	const documentReference = doc(db, path);
 	return await updateDoc(documentReference, data);
 };

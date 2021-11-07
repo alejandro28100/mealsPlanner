@@ -10,6 +10,7 @@ export interface Receipe {
 	ingredients: Ingredient[];
 	author: Author;
 	createdAt: any;
+	picture: string;
 }
 
 export interface Author {

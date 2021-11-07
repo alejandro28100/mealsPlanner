@@ -5,24 +5,29 @@ import React, {
 	useState,
 	Dispatch,
 	SetStateAction,
+	useRef,
+	ChangeEvent,
 } from "react";
 
 import Navbar from "components/Navbar";
 import Link from "next/link";
 
 import { nanoid } from "nanoid";
-import { getDocument, updateDocument } from "utils/firebase";
-import { getUnit } from "utils/unit";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { NextPage } from "next/types";
-import { Ingredient, Receipe } from "types/index";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+
 import { useUser } from "hooks/userUser";
-import { where } from "@firebase/firestore";
+
+import { Ingredient, Receipe, SavedReceipe } from "types/index";
+import { getDocument, updateDocument, storage } from "utils/firebase";
+import { getUnit } from "utils/unit";
 
 interface ReceipeUpdate {
 	name?: string;
 	ingredients?: Ingredient[];
+	picture?: string;
 }
 
 const units = [
@@ -40,8 +45,9 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 	const { id } = router.query;
 
 	const { user, loading: isUserLoading } = useUser({ protectedPage: true });
-
-	const [receipe, setReceipe] = useState<Receipe>({
+	const receipePictureInputRef = useRef<HTMLInputElement | null>(null);
+	const [receipe, setReceipe] = useState<SavedReceipe>({
+		picture: "",
 		ingredients: [],
 		name: "",
 		author: {
@@ -50,6 +56,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 			uid: "",
 		},
 		createdAt: new Date(),
+		id: "",
 	});
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -73,7 +80,10 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 		async function fetchReceipe() {
 			try {
 				const snapshot = await getDocument(`receipes/${id}`);
-				const data = snapshot.data() as Receipe;
+				const data = {
+					...snapshot.data(),
+					id: snapshot.id,
+				} as SavedReceipe;
 				console.log("Data received: ", data);
 				setReceipe(data);
 				setIsLoading(false);
@@ -89,6 +99,34 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 		}
 	}, [id, isUserLoading, user]);
 
+	function handleTriggerFileInput() {
+		receipePictureInputRef.current?.click();
+	}
+
+	async function handleOnPictureInputChange(
+		event: ChangeEvent<HTMLInputElement>
+	) {
+		const files = event?.target?.files as FileList;
+		const file = files[0];
+
+		if (!file) return;
+
+		const imageName: string =
+			(receipe.name.length !== 0 &&
+				`${receipe.name}.${file.type.split("/")[1]}`) ||
+			file.name;
+
+		const imageRef = ref(storage, `images/receipes/${receipe.id}/${imageName}`);
+
+		await uploadBytes(imageRef, file);
+
+		const imageURL = await getDownloadURL(imageRef);
+
+		await updateReceipe({
+			picture: imageURL,
+		});
+	}
+
 	async function updateReceipe(data: ReceipeUpdate) {
 		setSaving(true);
 		try {
@@ -97,13 +135,12 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 				return {
 					...prevReceipe,
 					...data,
-				} as Receipe;
+				} as SavedReceipe;
 			});
 		} catch (error) {
 			alert(
 				"Error al guardar la receta. Verifique su conexión e inténtelo nuevamente"
 			);
-			console.log("Error");
 		} finally {
 			setSaving(false);
 		}
@@ -175,13 +212,13 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 			<Navbar
 				start={
 					<input
-						className="text-2xl font-semibold"
+						className="hidden lg:inline-block text-2xl font-semibold"
 						type="text"
 						value={receipe?.name || ""}
 						onBlur={(e) => updateReceipe({ name: e.target.value })}
 						onChange={(e) =>
 							setReceipe(
-								(prev) => ({ ...prev, name: e.target.value } as Receipe)
+								(prev) => ({ ...prev, name: e.target.value } as SavedReceipe)
 							)
 						}
 					/>
@@ -206,42 +243,92 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 					</Link>
 				</nav>
 				<section className="space-y-5 flex flex-col lg:flex-row">
-					<div className="w-5/12">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							className="h-full w-full"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-							/>
-						</svg>
+					<div className="lg:w-5/12 lg:pr-5 py-8 text-center">
+						{isLoading ? (
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="h-full w-full object-cover"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+								/>
+							</svg>
+						) : receipe?.picture && receipe.picture.length !== 0 ? (
+							<Fragment>
+								<img
+									onClick={handleTriggerFileInput}
+									className="rounded object-cover w-full h-full"
+									src={receipe.picture}
+								/>
+								<input
+									className="mt-5 text-center lg:hidden text-2xl font-semibold w-full"
+									type="text"
+									value={receipe?.name || ""}
+									onBlur={(e) => updateReceipe({ name: e.target.value })}
+									onChange={(e) =>
+										setReceipe(
+											(prev) =>
+												({ ...prev, name: e.target.value } as SavedReceipe)
+										)
+									}
+								/>
+							</Fragment>
+						) : (
+							<svg
+								onClick={handleTriggerFileInput}
+								xmlns="http://www.w3.org/2000/svg"
+								className="h-full w-full"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+								/>
+							</svg>
+						)}
+						<input
+							className="hidden"
+							ref={receipePictureInputRef}
+							onChange={handleOnPictureInputChange}
+							type="file"
+							multiple={false}
+							accept=".jpeg,.jpg,.png"
+						/>
 					</div>
 					<div className="w-auto">
 						{isLoading ? (
 							<h1 className="text-secondary">Cargando Receta...</h1>
 						) : (
 							<Fragment>
-								<h2 className="font-semibold text-lg">Ingredientes</h2>
+								<h2 className="font-semibold text-lg my-4">Ingredientes</h2>
 
-								<table className="flex space-y-5 flex-col">
+								<table className="flex space-y-5 flex-col overflow-x-auto my-5">
 									<thead>
-										<tr className="flex justify-between text-secondary border-b border-secondary">
-											<th className="w-1/4 font-semibold text-left">Nombre</th>
-											<th className="w-1/4 mx-4 font-semibold text-left">
+										<tr className="flex justify-between text-secondary md:border-b md:border-secondary">
+											<th className="w-1/4 font-semibold text-left min-w-[100px]">
+												Nombre
+											</th>
+											<th className="w-1/4 mx-4 font-semibold text-left min-w-[100px]">
 												Cantidad
 											</th>
-											<th className="w-1/4 font-semibold text-left">Unidad</th>
-											<th className="w-1/4"></th>
+											<th className="w-1/4 font-semibold text-left min-w-[100px]">
+												Unidad
+											</th>
+											<th className="w-1/4 min-w-[100px]"></th>
 										</tr>
 									</thead>
 									<tr className="flex items-center justify-between">
-										<td className="w-1/4">
+										<td className="w-1/4 min-w-[100px]">
 											<input
 												className="w-full border border-secondary rounded-sm"
 												type="text"
@@ -255,11 +342,11 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 												}
 											/>
 										</td>
-										<td className="w-1/4 mx-4">
+										<td className="w-1/4 mx-4 min-w-[100px]">
 											<input
 												className="w-full border border-secondary rounded-sm"
 												disabled={saving}
-												type="text"
+												type="number"
 												value={newIngredient.amount}
 												onChange={(e) =>
 													setNewIngredient({
@@ -269,7 +356,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 												}
 											/>
 										</td>
-										<td className="w-1/4">
+										<td className="w-1/4 min-w-[100px]">
 											<select
 												className="w-2/3 border border-secondary rounded-sm"
 												disabled={saving}
@@ -288,7 +375,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 												))}
 											</select>
 										</td>
-										<td className="w-1/4">
+										<td className="w-1/4 min-w-[100px]">
 											<button
 												className="text-sm px-2 py-1 border border-secondary rounded"
 												disabled={saving}
@@ -341,8 +428,8 @@ const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
 	handleUpdateIngredient,
 }) => {
 	return (
-		<tr className="flex justify-between" key={id}>
-			<td className="w-1/4">
+		<tr className="flex justify-between " key={id}>
+			<td className="w-1/4 min-w-[100px]">
 				{ingredientEdited.id === id ? (
 					<input
 						className="w-full border border-secondary rounded-sm"
@@ -359,7 +446,10 @@ const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
 					name
 				)}
 			</td>
-			<td className="w-1/4 mx-4" colSpan={ingredientEdited.id === id ? 1 : 2}>
+			<td
+				className="w-1/4 mx-4 min-w-[100px]"
+				colSpan={ingredientEdited.id === id ? 1 : 2}
+			>
 				{ingredientEdited.id === id ? (
 					<input
 						className="w-full border border-secondary rounded-sm"
@@ -378,7 +468,7 @@ const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
 			</td>
 
 			{ingredientEdited.id === id ? (
-				<td className="w-1/4">
+				<td className="w-1/4 min-w-[100px]">
 					<select
 						className="border border-secondary rounded-sm"
 						value={ingredientEdited.unit}
@@ -400,10 +490,10 @@ const ReceipeIngredientRow: FC<ReceipeIngredientRowProps> = ({
 					</select>
 				</td>
 			) : (
-				<td className="w-1/4"></td>
+				<td className="w-1/4 min-w-[100px]"></td>
 			)}
 
-			<td className="space-x-5 w-1/4 text-right">
+			<td className="space-x-5 w-1/4 min-w-[100px] text-right">
 				<button
 					disabled={!!ingredientEdited.id && ingredientEdited.id !== id}
 					onClick={() => {
