@@ -55,6 +55,8 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 				uid: user?.uid as string,
 			},
 			createdAt: serverTimestamp(),
+			steps: "",
+			picture: "",
 		};
 		const snapshot = await addDocument("receipes", newReceipe);
 		const documentID = snapshot.id;
