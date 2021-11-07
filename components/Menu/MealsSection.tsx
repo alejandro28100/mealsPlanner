@@ -103,12 +103,19 @@ const MealsSection: FC<MealsSectionProps> = ({
 				<div className="flex items-center justify-center min-h-screen">
 					<Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
 
-					<div className="relative flex flex-col bg-white rounded w-[90vw] sm:w-[60vw] md:w-[50vw] lg:w-[30vw] h-[50vh] mx-auto p-8 space-y-5 overflow-y-auto">
+					<div className="relative flex flex-col bg-white rounded w-[90vw] sm:w-[60vw] md:w-[50vw] lg:w-[35vw] h-[90vh] mx-auto p-12 space-y-5 overflow-y-auto">
 						{selectedReceipe && (
 							<Fragment>
 								<Dialog.Title className="text-xl font-bold">
 									{selectedReceipe.name}
 								</Dialog.Title>
+								{receipe?.picture && (
+									<img
+										className="my-5 rounded w-full h-auto object-cover"
+										src={receipe.picture}
+										alt={receipe?.name}
+									/>
+								)}
 								<Dialog.Description
 									aria-hidden
 									className="font-semibold hidden"
@@ -116,6 +123,7 @@ const MealsSection: FC<MealsSectionProps> = ({
 									{selectedReceipe.name}
 								</Dialog.Description>
 
+								<h3 className="text-lg font-semibold my-2">Ingredientes</h3>
 								<div className="flex-1 space-y-2">
 									{receipe?.ingredients.map((ingredient) => (
 										<p
@@ -127,6 +135,11 @@ const MealsSection: FC<MealsSectionProps> = ({
 											<span>{ingredient.unit}</span>
 										</p>
 									))}
+								</div>
+
+								<div className="flex-1 space-y-2 whitespace-pre-wrap">
+									<h3 className="text-lg font-semibold my-2">Pasos</h3>
+									{receipe?.steps}
 								</div>
 
 								<div className="flex items-center justify-end space-x-4">

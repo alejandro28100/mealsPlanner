@@ -11,6 +11,7 @@ export interface Receipe {
 	author: Author;
 	createdAt: any;
 	picture: string;
+	steps: string;
 }
 
 export interface Author {

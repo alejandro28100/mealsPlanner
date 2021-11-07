@@ -94,7 +94,7 @@ const Menu = () => {
 			<Navbar
 				links={[
 					<Link key="link" href="/recetas">
-						Ver recetas
+						Ver mis recetas
 					</Link>,
 				]}
 				end={

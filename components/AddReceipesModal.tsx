@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect, FC } from "react";
+import { Fragment, useState, useEffect, useCallback, FC } from "react";
 
 import { Dialog } from "@headlessui/react";
 import ReceipesPicker from "./ReceipesPicker";
@@ -80,8 +80,9 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({
 		setLoadingReceipes(false);
 	}
 
-	async function getReceipes() {
+	const getReceipes = useCallback(async () => {
 		if (isUserLoading && !isOpen) return;
+
 		const snapshot = await getDocuments(
 			"receipes",
 			where("author.uid", "==", user?.uid),
@@ -98,11 +99,11 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({
 		});
 		setReceipes(receipes);
 		setLoadingReceipes(false);
-	}
+	}, [isUserLoading, isOpen]);
 
 	useEffect(() => {
 		getReceipes();
-	}, [user, getReceipes]);
+	}, []);
 
 	return (
 		<Fragment>

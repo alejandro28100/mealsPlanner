@@ -28,6 +28,7 @@ interface ReceipeUpdate {
 	name?: string;
 	ingredients?: Ingredient[];
 	picture?: string;
+	steps?: string;
 }
 
 const units = [
@@ -57,6 +58,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 		},
 		createdAt: new Date(),
 		id: "",
+		steps: "",
 	});
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -263,7 +265,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 							<Fragment>
 								<img
 									onClick={handleTriggerFileInput}
-									className="rounded object-cover w-full h-full"
+									className="rounded object-cover w-full h-full lg:h-1/2"
 									src={receipe.picture}
 								/>
 								<input
@@ -399,6 +401,21 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 										/>
 									))}
 								</table>
+								<section className="my-5">
+									<h2 className="font-semibold text-lg my-4">Pasos</h2>
+									<textarea
+										className="w-full border border-gray-500 rounded"
+										cols={30}
+										rows={10}
+										onBlur={(e) => updateReceipe({ steps: e.target.value })}
+										onChange={(e) =>
+											setReceipe(
+												(prev) =>
+													({ ...prev, steps: e.target.value } as SavedReceipe)
+											)
+										}
+									></textarea>
+								</section>
 							</Fragment>
 						)}
 					</div>
