@@ -10,6 +10,7 @@ export default function useGetReceipe(receipeID: string) {
 	useEffect(() => {
 		(async function () {
 			setLoading(true);
+			if (!receipeID) return;
 			try {
 				const snapshot = await getDocument(`receipes/${receipeID}`);
 				const data = snapshot.data() as SavedReceipe;
@@ -23,7 +24,6 @@ export default function useGetReceipe(receipeID: string) {
 				setError(
 					"No se pudo obtener la receta. Verifique su conexión a internet."
 				);
-				console.error(error);
 			}
 		})();
 	}, [receipeID]);
