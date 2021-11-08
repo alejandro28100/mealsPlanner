@@ -104,11 +104,15 @@ const MealsSection: FC<MealsSectionProps> = ({
 					<Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
 
 					<div className="relative flex flex-col bg-white rounded w-[90vw] sm:w-[60vw] md:w-[50vw] lg:w-[35vw] h-[90vh] mx-auto p-12 space-y-5 overflow-y-auto">
+						<Dialog.Title className="text-xl font-bold">
+							{isLoading
+								? "Cargando Receta..."
+								: error
+								? error
+								: selectedReceipe?.name}
+						</Dialog.Title>
 						{selectedReceipe && (
 							<Fragment>
-								<Dialog.Title className="text-xl font-bold">
-									{selectedReceipe.name}
-								</Dialog.Title>
 								{receipe?.picture && (
 									<img
 										className="my-5 rounded w-full h-auto object-cover"
@@ -120,7 +124,7 @@ const MealsSection: FC<MealsSectionProps> = ({
 									aria-hidden
 									className="font-semibold hidden"
 								>
-									{selectedReceipe.name}
+									{selectedReceipe?.name}
 								</Dialog.Description>
 
 								<h3 className="text-lg font-semibold my-2">Ingredientes</h3>
