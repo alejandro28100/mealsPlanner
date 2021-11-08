@@ -111,7 +111,7 @@ const MealsSection: FC<MealsSectionProps> = ({
 								? error
 								: selectedReceipe?.name}
 						</Dialog.Title>
-						{selectedReceipe && (
+						{selectedReceipe && receipe && (
 							<Fragment>
 								{receipe?.picture && (
 									<img

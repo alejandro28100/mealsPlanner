@@ -84,7 +84,7 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({
 		if (isUserLoading || !isOpen) return;
 
 		try {
-			console.log("Fetching user receipes");
+			// console.log("Fetching user receipes");
 			const snapshot = await getDocuments(
 				"receipes",
 				where("author.uid", "==", user?.uid),

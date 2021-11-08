@@ -17,14 +17,15 @@ const Home: NextPage = () => {
 		authRedirect: "/",
 	});
 
-	const provider: GoogleAuthProvider = new GoogleAuthProvider();
+	const provider = new GoogleAuthProvider();
 
 	async function handleSignUp() {
 		try {
 			const result = await signInWithPopup(auth, provider);
-			console.log(result.user);
 		} catch (error) {
-			console.error(error);
+			alert(
+				"No se pudo iniciar sesión. Verifica tu conexión a internet e inténtalo más tarde."
+			);
 		}
 	}
 

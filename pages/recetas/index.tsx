@@ -9,8 +9,16 @@ import { addDocument, getDocuments } from "utils/firebase";
 import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { useUser } from "hooks/userUser";
-import { orderBy, serverTimestamp, where } from "@firebase/firestore";
+import {
+	orderBy,
+	serverTimestamp,
+	where,
+	limit,
+	startAfter,
+} from "@firebase/firestore";
 import Navbar from "components/Navbar";
+
+const PAGE_SIZE = 10;
 
 const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 	const { user, loading } = useUser({
@@ -19,6 +27,38 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 
 	const [loadingReceipes, setLoadingReceipes] = useState(true);
 	const [receipes, setReceipes] = useState<SavedReceipe[]>([]);
+	const [isLastReceipesPage, setIsLastReceipesPage] = useState(false);
+
+	async function getNextReceipes() {
+		setLoadingReceipes(true);
+		// @ts-ignore
+		const { createdAt } = receipes[receipes?.length - 1];
+
+		const snapshot = await getDocuments(
+			"receipes",
+			where("author.uid", "==", user?.uid),
+			orderBy("createdAt", "desc"),
+			startAfter(createdAt),
+			limit(PAGE_SIZE)
+		);
+
+		if (snapshot.empty) {
+			// No more receipes
+			setIsLastReceipesPage(true);
+			setLoadingReceipes(false);
+			return;
+		}
+
+		let commingReceipes: SavedReceipe[] = [];
+		snapshot.forEach((doc) => {
+			commingReceipes.push({
+				...doc.data(),
+				id: doc.id,
+			} as SavedReceipe);
+		});
+		setReceipes((prev) => [...(prev as SavedReceipe[]), ...commingReceipes]);
+		setLoadingReceipes(false);
+	}
 
 	useEffect(() => {
 		if (!loading) {
@@ -29,7 +69,8 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 			const snapshot = await getDocuments(
 				`/receipes`,
 				where("author.uid", "==", user?.uid),
-				orderBy("createdAt", "desc")
+				orderBy("createdAt", "desc"),
+				limit(PAGE_SIZE)
 			);
 
 			const docs = snapshot.docs.map(
@@ -90,6 +131,18 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 			<main className="px-11 md:px-32 relative h-[85vh] overflow-y-auto">
 				<section className="my-4">
 					<div className="space-y-8">{renderReceipes()}</div>
+					{!isLastReceipesPage && (
+						<div className="text-center my-5">
+							<button
+								disabled={loadingReceipes}
+								onClick={getNextReceipes}
+								className="btn"
+							>
+								Cargar Más Recetas
+							</button>
+						</div>
+					)}
+
 					<div className="absolute bottom-0 right-0 mx-11">
 						<button className="btn" onClick={createReceipe}>
 							Añadir nueva receta 🍽

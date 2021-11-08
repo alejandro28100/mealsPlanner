@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 export interface Ingredient {
 	id: string;
 	name: string;
@@ -30,4 +31,11 @@ export interface Meal {
 	id: string;
 	name: string;
 	time?: MealTime;
+}
+
+export type CalendarView = "daily" | "monthly";
+
+export interface ViewPicker {
+	view: CalendarView;
+	setView: Dispatch<SetStateAction<CalendarView>>;
 }

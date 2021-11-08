@@ -9,8 +9,10 @@ import React, {
 	ChangeEvent,
 } from "react";
 
-import Navbar from "components/Navbar";
 import Link from "next/link";
+import Head from "next/head";
+
+import Navbar from "components/Navbar";
 
 import { nanoid } from "nanoid";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -86,14 +88,14 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 					...snapshot.data(),
 					id: snapshot.id,
 				} as SavedReceipe;
-				console.log("Data received: ", data);
+				// console.log("Data received: ", data);
 				setReceipe(data);
 				setIsLoading(false);
 			} catch (error) {
 				alert(
 					"No se pudo obtener la receta. Verifique su conexión a internet."
 				);
-				console.error(error);
+				// console.error(error);
 			}
 		}
 		if (!isUserLoading) {
@@ -211,10 +213,13 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 
 	return (
 		<Fragment>
+			<Head>
+				<title>{receipe?.name}</title>
+			</Head>
 			<Navbar
 				start={
 					<input
-						className="hidden lg:inline-block text-2xl font-semibold"
+						className="w-full hidden lg:inline-block text-2xl font-semibold"
 						type="text"
 						value={receipe?.name || ""}
 						onBlur={(e) => updateReceipe({ name: e.target.value })}
@@ -229,8 +234,8 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 					<Link key="link-1" href="/menu">
 						<a className="hidden md:inline-block">Ver Menú 📅</a>
 					</Link>,
-					<Link key="link-2" href="/menu">
-						<a className="hidden md:inline-block">Ver Recetas 🍽</a>
+					<Link key="link-2" href="/recetas">
+						<a className="hidden md:inline-block">Ver Recetas 📕</a>
 					</Link>,
 				]}
 			/>
@@ -241,7 +246,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 					</Link>
 
 					<Link href="/recetas">
-						<a>Ver Recetas 🍽</a>
+						<a>Ver Recetas 📕</a>
 					</Link>
 				</nav>
 				<section className="space-y-5 flex flex-col lg:flex-row">
@@ -264,6 +269,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 						) : receipe?.picture && receipe.picture.length !== 0 ? (
 							<Fragment>
 								<img
+									title="Cambiar imagen"
 									onClick={handleTriggerFileInput}
 									className="rounded object-cover w-full h-full lg:h-1/2"
 									src={receipe.picture}
@@ -283,6 +289,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 							</Fragment>
 						) : (
 							<svg
+								xlinkTitle="Cambiar imagen"
 								onClick={handleTriggerFileInput}
 								xmlns="http://www.w3.org/2000/svg"
 								className="h-full w-full"
@@ -329,77 +336,80 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 											<th className="w-1/4 min-w-[100px]"></th>
 										</tr>
 									</thead>
-									<tr className="flex items-center justify-between">
-										<td className="w-1/4 min-w-[100px]">
-											<input
-												className="w-full border border-secondary rounded-sm"
-												type="text"
-												disabled={saving}
-												value={newIngredient.name}
-												onChange={(e) =>
-													setNewIngredient({
-														...newIngredient,
-														name: e.target.value,
-													})
-												}
-											/>
-										</td>
-										<td className="w-1/4 mx-4 min-w-[100px]">
-											<input
-												className="w-full border border-secondary rounded-sm"
-												disabled={saving}
-												type="number"
-												value={newIngredient.amount}
-												onChange={(e) =>
-													setNewIngredient({
-														...newIngredient,
-														amount: e.target.value,
-													})
-												}
-											/>
-										</td>
-										<td className="w-1/4 min-w-[100px]">
-											<select
-												className="w-2/3 border border-secondary rounded-sm"
-												disabled={saving}
-												value={newIngredient.unit}
-												onChange={(e) => {
-													setNewIngredient({
-														...newIngredient,
-														unit: e.target.value,
-													});
+									<tbody>
+										<tr className="flex items-center justify-between">
+											<td className="w-1/4 min-w-[100px]">
+												<input
+													className="w-full border border-secondary rounded-sm"
+													type="text"
+													disabled={saving}
+													value={newIngredient.name}
+													onChange={(e) =>
+														setNewIngredient({
+															...newIngredient,
+															name: e.target.value,
+														})
+													}
+												/>
+											</td>
+											<td className="w-1/4 mx-4 min-w-[100px]">
+												<input
+													className="w-full border border-secondary rounded-sm"
+													disabled={saving}
+													type="number"
+													value={newIngredient.amount}
+													onChange={(e) =>
+														setNewIngredient({
+															...newIngredient,
+															amount: e.target.value,
+														})
+													}
+												/>
+											</td>
+											<td className="w-1/4 min-w-[100px]">
+												<select
+													className="w-2/3 border border-secondary rounded-sm"
+													disabled={saving}
+													value={newIngredient.unit}
+													onChange={(e) => {
+														setNewIngredient({
+															...newIngredient,
+															unit: e.target.value,
+														});
+													}}
+												>
+													<option value=""></option>
+													{units.map((unit) => (
+														<option key={`unit-option-${unit}`} value={unit}>
+															{unit}
+														</option>
+													))}
+												</select>
+											</td>
+											<td className="w-1/4 min-w-[100px]">
+												<button
+													className="text-sm px-2 py-1 border border-secondary rounded"
+													disabled={saving}
+													onClick={handleAddIngredient}
+												>
+													Agregar Ingrediente
+												</button>
+											</td>
+										</tr>
+										{receipe?.ingredients.map((ingredient: Ingredient) => (
+											<ReceipeIngredientRow
+												key={ingredient.id}
+												{...{
+													...ingredient,
+													ingredientEdited,
+													handleEditIngredient,
+													handleRemoveIngredient,
+													handleUpdateIngredient,
+													setIngredientEdited,
 												}}
-											>
-												{units.map((unit) => (
-													<option key={`unit-option-${unit}`} value={unit}>
-														{unit}
-													</option>
-												))}
-											</select>
-										</td>
-										<td className="w-1/4 min-w-[100px]">
-											<button
-												className="text-sm px-2 py-1 border border-secondary rounded"
-												disabled={saving}
-												onClick={handleAddIngredient}
-											>
-												Agregar Ingrediente
-											</button>
-										</td>
-									</tr>
-									{receipe?.ingredients.map((ingredient: Ingredient) => (
-										<ReceipeIngredientRow
-											key={ingredient.id}
-											{...{
-												...ingredient,
-												ingredientEdited,
-												handleEditIngredient,
-												handleRemoveIngredient,
-												handleUpdateIngredient,
-												setIngredientEdited,
-											}}
-										/>
-									))}
+											/>
+										))}
+									</tbody>
 								</table>
 								<section className="my-5">
 									<h2 className="font-semibold text-lg my-4">Pasos</h2>
@@ -408,6 +418,7 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 										cols={30}
 										rows={10}
 										onBlur={(e) => updateReceipe({ steps: e.target.value })}
+										value={receipe?.steps || ""}
 										onChange={(e) =>
 											setReceipe(
 												(prev) =>
