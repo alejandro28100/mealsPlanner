@@ -81,29 +81,33 @@ const AddReceipesModal: FC<AddReceipesModalProps> = ({
 	}
 
 	const getReceipes = useCallback(async () => {
-		if (isUserLoading && !isOpen) return;
+		if (isUserLoading || !isOpen) return;
 
-		const snapshot = await getDocuments(
-			"receipes",
-			where("author.uid", "==", user?.uid),
-			orderBy("createdAt", "desc"),
-			limit(PAGE_SIZE)
-		);
-
-		let receipes: SavedReceipe[] = [];
-		snapshot.forEach((doc) => {
-			receipes.push({
-				...doc.data(),
-				id: doc.id,
-			} as SavedReceipe);
-		});
-		setReceipes(receipes);
-		setLoadingReceipes(false);
+		try {
+			console.log("Fetching user receipes");
+			const snapshot = await getDocuments(
+				"receipes",
+				where("author.uid", "==", user?.uid),
+				orderBy("createdAt", "desc"),
+				limit(PAGE_SIZE)
+			);
+			let receipes: SavedReceipe[] = [];
+			snapshot.forEach((doc) => {
+				receipes.push({
+					...doc.data(),
+					id: doc.id,
+				} as SavedReceipe);
+			});
+			setReceipes(receipes);
+			setLoadingReceipes(false);
+		} catch (error) {
+			console.log(error);
+		}
 	}, [isUserLoading, isOpen]);
 
 	useEffect(() => {
 		getReceipes();
-	}, []);
+	}, [isOpen]);
 
 	return (
 		<Fragment>
