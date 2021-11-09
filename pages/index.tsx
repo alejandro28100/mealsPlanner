@@ -1,4 +1,8 @@
-import { GoogleAuthProvider, signInWithPopup } from "@firebase/auth";
+import {
+	GoogleAuthProvider,
+	signInWithPopup,
+	signInWithRedirect,
+} from "@firebase/auth";
 import { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
@@ -22,7 +26,7 @@ const Home: NextPage = () => {
 
 	async function handleSignUp() {
 		try {
-			const result = await signInWithPopup(auth, provider);
+			await signInWithRedirect(auth, provider);
 		} catch (error) {
 			alert(
 				"No se pudo iniciar sesión. Verifica tu conexión a internet e inténtalo más tarde."
@@ -33,7 +37,7 @@ const Home: NextPage = () => {
 	return (
 		<div>
 			<Head>
-				<title>Food Planner App</title>
+				<title>Meals Planner App</title>
 				<meta name="description" content="Food Planner App" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
