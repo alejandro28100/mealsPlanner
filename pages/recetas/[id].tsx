@@ -219,9 +219,11 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 			<Navbar
 				start={
 					<input
-						className="w-full hidden lg:inline-block text-2xl font-semibold"
+						disabled={isLoading || saving}
+						className="w-full px-2 hidden lg:inline-block text-2xl font-semibold border border-gray-500 rounded"
 						type="text"
 						value={receipe?.name || ""}
+						placeholder="Nombre de la receta"
 						onBlur={(e) => updateReceipe({ name: e.target.value })}
 						onChange={(e) =>
 							setReceipe(
@@ -232,23 +234,14 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 				}
 				links={[
 					<Link key="link-1" href="/menu">
-						<a className="hidden md:inline-block">Ver Menú 📅</a>
+						<a className="">Ver Menú 📅</a>
 					</Link>,
 					<Link key="link-2" href="/recetas">
-						<a className="hidden md:inline-block">Ver Recetas 📕</a>
+						<a className="">Ver Recetas 📕</a>
 					</Link>,
 				]}
 			/>
 			<main className="px-11 md:px-32">
-				<nav className="flex md:hidden justify-end items-center space-x-4">
-					<Link href="/menu">
-						<a>Ver Menú 📅</a>
-					</Link>
-
-					<Link href="/recetas">
-						<a>Ver Recetas 📕</a>
-					</Link>
-				</nav>
 				<section className="space-y-5 flex flex-col lg:flex-row">
 					<div className="lg:w-5/12 lg:pr-5 py-8 text-center">
 						{isLoading ? (
@@ -274,18 +267,6 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 									className="rounded object-cover w-full h-full lg:h-1/2"
 									src={receipe.picture}
 								/>
-								<input
-									className="mt-5 text-center lg:hidden text-2xl font-semibold w-full"
-									type="text"
-									value={receipe?.name || ""}
-									onBlur={(e) => updateReceipe({ name: e.target.value })}
-									onChange={(e) =>
-										setReceipe(
-											(prev) =>
-												({ ...prev, name: e.target.value } as SavedReceipe)
-										)
-									}
-								/>
 							</Fragment>
 						) : (
 							<svg
@@ -305,6 +286,19 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 								/>
 							</svg>
 						)}
+						<input
+							disabled={isLoading || saving}
+							className="mt-5 text-center lg:hidden text-2xl font-semibold w-full border border-gray-500 rounded"
+							type="text"
+							value={receipe?.name || ""}
+							placeholder="Nombre de la receta"
+							onBlur={(e) => updateReceipe({ name: e.target.value })}
+							onChange={(e) =>
+								setReceipe(
+									(prev) => ({ ...prev, name: e.target.value } as SavedReceipe)
+								)
+							}
+						/>
 						<input
 							className="hidden"
 							ref={receipePictureInputRef}
@@ -414,7 +408,8 @@ const Receta: NextPage<WithRouterProps> = ({ router }) => {
 								<section className="my-5">
 									<h2 className="font-semibold text-lg my-4">Pasos</h2>
 									<textarea
-										className="w-full border border-gray-500 rounded"
+										disabled={isLoading || saving}
+										className="p-4 w-full border border-gray-500 rounded"
 										cols={30}
 										rows={10}
 										onBlur={(e) => updateReceipe({ steps: e.target.value })}

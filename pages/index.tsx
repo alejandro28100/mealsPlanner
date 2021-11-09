@@ -15,17 +15,27 @@ import { BsCalendar } from "react-icons/bs";
 import { useUser } from "hooks/userUser";
 import { auth } from "utils/firebase";
 import UserProfileMenu from "components/UserProfileMenu";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
+	const [isLoading, setIsLoading] = useState(false);
+	const router = useRouter();
 	const { user, loading: isUserLoading } = useUser({
 		protectedPage: true,
-		authRedirect: "/",
 	});
 
 	const provider = new GoogleAuthProvider();
-
+	useEffect(() => {
+		if (window.location.hash === "#redirecting") {
+			setIsLoading(true);
+			window.location.hash = "";
+			router.push("/recetas");
+		}
+	}, []);
 	async function handleSignUp() {
 		try {
+			window.location.hash = "redirecting";
 			await signInWithRedirect(auth, provider);
 		} catch (error) {
 			alert(
@@ -41,20 +51,26 @@ const Home: NextPage = () => {
 				<meta name="description" content="Food Planner App" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
+
 			<Navbar
 				end={
 					user ? (
 						<UserProfileMenu user={user} />
 					) : (
-						<button
-							onClick={handleSignUp}
-							className="btn flex items-center justify-center"
-						>
-							Iniciar sesión con Google <FcGoogle className="mx-2" />
-						</button>
+						!isLoading && (
+							<button
+								onClick={handleSignUp}
+								className="btn flex items-center justify-center"
+							>
+								Iniciar sesión con Google <FcGoogle className="mx-2" />
+							</button>
+						)
 					)
 				}
 			/>
+			{isLoading && (
+				<hr className="h-2 bg-black animate-pulse-fast duration-200 " />
+			)}
 			<main className="h-screen flex flex-col px-11 md:px-32">
 				<section className="flex-1 space-y-10 md:space-y-0 flex flex-col lg:flex-row items-center justify-center">
 					<div className="flex flex-col justify-center space-y-7 h-full md:mr-5">
@@ -85,12 +101,14 @@ const Home: NextPage = () => {
 								</Link>
 							</div>
 						) : (
-							<button
-								onClick={handleSignUp}
-								className="btn self-start text-lg px-6 py-2"
-							>
-								¡Pruébalo Hoy!
-							</button>
+							!isLoading && (
+								<button
+									onClick={handleSignUp}
+									className="btn self-start text-lg px-6 py-2"
+								>
+									¡Pruébalo Hoy!
+								</button>
+							)
 						)}
 					</div>
 					<img

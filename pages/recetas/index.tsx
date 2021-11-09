@@ -62,7 +62,7 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 	}
 
 	useEffect(() => {
-		if (!loading) {
+		if (!loading && user) {
 			getReceipes();
 		}
 
@@ -125,7 +125,7 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 				start={<h1 className="text-lg font-semibold">Mis recetas</h1>}
 				links={[
 					<Link key="link" href="/menu">
-						<a>Ver menú 📅</a>
+						<a className="btn outlined">Ver menú 📅</a>
 					</Link>,
 				]}
 				end={!loading && user && <UserProfileMenu user={user} />}

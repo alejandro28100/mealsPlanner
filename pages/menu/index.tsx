@@ -58,7 +58,7 @@ const Menu = () => {
 			<Navbar
 				links={[
 					<Link key="link" href="/recetas">
-						Ver mis recetas 📕
+						<a className="btn outlined">Ver mis recetas 📕</a>
 					</Link>,
 				]}
 				end={!loading && user && <UserProfileMenu user={user} />}
