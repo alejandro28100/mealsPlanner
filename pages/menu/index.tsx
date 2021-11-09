@@ -12,6 +12,7 @@ import DateLabel from "components/DateLabel";
 import CalendarNavbar from "components/CalendarNavbar";
 import ViewPicker from "components/ViewPicker";
 import CustomDay from "components/CustomDay";
+import UserProfileMenu from "components/UserProfileMenu";
 
 import { useUser } from "hooks/userUser";
 import { User } from "@firebase/auth";
@@ -60,18 +61,7 @@ const Menu = () => {
 						Ver mis recetas 📕
 					</Link>,
 				]}
-				end={
-					!loading &&
-					user && (
-						<div className="w-12 h-w-12">
-							<img
-								className="w-full h-full rounded-full"
-								src={photoURL!}
-								alt={displayName!}
-							/>
-						</div>
-					)
-				}
+				end={!loading && user && <UserProfileMenu user={user} />}
 			/>
 			<hr className="h-px text-secondary" />
 			<main>

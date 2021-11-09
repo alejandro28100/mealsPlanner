@@ -36,7 +36,9 @@ const Navbar: FC<NavbarProps> = ({ start, end, links }) => {
 };
 
 const NavbarLink: FC = ({ children }) => {
-	return <li className="font-medium hover:text-black/80">{children}</li>;
+	return (
+		<li className="font-medium hover:text-black/80 btn outlined">{children}</li>
+	);
 };
 
 export default Navbar;

@@ -17,6 +17,7 @@ import {
 	startAfter,
 } from "@firebase/firestore";
 import Navbar from "components/Navbar";
+import UserProfileMenu from "components/UserProfileMenu";
 
 const PAGE_SIZE = 10;
 
@@ -124,9 +125,10 @@ const ReceipesPage: NextPage<WithRouterProps> = ({ router }) => {
 				start={<h1 className="text-lg font-semibold">Mis recetas</h1>}
 				links={[
 					<Link key="link" href="/menu">
-						<a className="btn outlined">Ver menú 📅</a>
+						<a>Ver menú 📅</a>
 					</Link>,
 				]}
+				end={!loading && user && <UserProfileMenu user={user} />}
 			/>
 			<main className="px-11 md:px-32 relative h-[85vh] overflow-y-auto">
 				<section className="my-4">
