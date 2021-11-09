@@ -72,7 +72,7 @@ const Home: NextPage = () => {
 				<hr className="h-2 bg-black animate-pulse-fast duration-200 " />
 			)}
 			<main className="h-screen flex flex-col px-11 md:px-32">
-				<section className="flex-1 space-y-10 md:space-y-0 flex flex-col lg:flex-row items-center justify-center">
+				<section className="flex-1 lg:my-10 space-y-10 md:space-y-0 flex flex-col lg:flex-row items-center justify-center">
 					<div className="flex flex-col justify-center space-y-7 h-full md:mr-5">
 						<h1 className="text-4xl md:text-7xl font-black">
 							Tu recetario <br /> digital de confianza
@@ -111,18 +111,62 @@ const Home: NextPage = () => {
 							)
 						)}
 					</div>
-					<img
-						className=""
-						width="400px"
-						height="400px"
-						src="/imgs/food.png"
-						alt=""
-					/>
+					<img className="h-96 object-scale-down" src="/imgs/food.png" alt="" />
 				</section>
-				{/* 
-				<section className="text-center">
-					<h1 className="text-2xl md:text-5xl font-black">Conoce la app </h1>
-				</section> */}
+
+				<section className="text-center my-4">
+					<h1 className="my-10 text-3xl md:text-5xl font-black">
+						Conoce la app{" "}
+					</h1>
+					<div className="my-5 space-y-5">
+						<h2 className="my-2 text-xl md:text-3xl font-black">
+							Añade tus recetas favoritas
+						</h2>
+						<div className="flex flex-col lg:flex-row lg:justify-evenly">
+							<img
+								className="h-[700px] object-scale-down"
+								src="/imgs/mobile1.png"
+								alt=""
+							/>
+							<img
+								className="h-[700px] object-scale-down"
+								src="/imgs/mobile2.png"
+								alt=""
+							/>
+						</div>
+					</div>
+
+					<div className="my-20 space-y-5">
+						<h2 className="my-2 text-xl md:text-3xl font-black">
+							Añade tus recetas a tu menú
+						</h2>
+						<div className="flex flex-col lg:flex-row lg:justify-evenly">
+							<img
+								className="h-[700px] object-scale-down"
+								src="/imgs/mobile4.png"
+								alt=""
+							/>
+							<img
+								className="h-[700px] object-scale-down"
+								src="/imgs/mobile3.png"
+								alt=""
+							/>
+						</div>
+					</div>
+
+					<div className="my-20 space-y-5">
+						<h2 className="my-2 text-xl md:text-3xl font-black">
+							Consulta tus recetas desde tu menú
+						</h2>
+						<div className="flex justify-center">
+							<img
+								className="h-[700px] object-scale-down"
+								src="/imgs/mobile5.png"
+								alt=""
+							/>
+						</div>
+					</div>
+				</section>
 			</main>
 		</div>
 	);
