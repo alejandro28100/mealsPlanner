@@ -3,12 +3,14 @@ import { FC, Fragment } from "react";
 import { Popover } from "@headlessui/react";
 
 import { User } from "firebase/auth";
+import { useUser } from "hooks/userUser";
 
 interface UserProfileMenuProps {
 	user: User;
 }
 
 const UserProfileMenu: FC<UserProfileMenuProps> = ({ user }) => {
+	const { logOut} = useUser();
 	const { photoURL, displayName, email } = user;
 	return (
 		<Popover as={Fragment}>
@@ -27,8 +29,9 @@ const UserProfileMenu: FC<UserProfileMenuProps> = ({ user }) => {
 				</article>
 
 				<hr className="w-full" />
+				
 				<div className="w-full p-6 text-center">
-					<button className="px-4 py-2 rounded border border-gray-500 hover:bg-black hover:text-white hover:border-black">
+					<button onClick={logOut} className="px-4 py-2 rounded border border-gray-500 hover:bg-black hover:text-white hover:border-black">
 						Cerrar Sesión
 					</button>
 				</div>
