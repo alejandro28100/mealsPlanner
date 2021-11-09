@@ -10,6 +10,7 @@ import { BsCalendar } from "react-icons/bs";
 
 import { useUser } from "hooks/userUser";
 import { auth } from "utils/firebase";
+import UserProfileMenu from "components/UserProfileMenu";
 
 const Home: NextPage = () => {
 	const { user, loading: isUserLoading } = useUser({
@@ -39,8 +40,9 @@ const Home: NextPage = () => {
 
 			<Navbar
 				end={
-					!isUserLoading &&
-					!user && (
+					user ? (
+						<UserProfileMenu user={user} />
+					) : (
 						<button
 							onClick={handleSignUp}
 							className="btn flex items-center justify-center"
