@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, Fragment } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { SavedReceipe } from "types/index";
 
@@ -28,24 +28,21 @@ const ReceipesPicker: FC<ReceipesPicker> = ({
 				{loading ? (
 					"Cargando recetas..."
 				) : (
-					<div className="space-y-2 py-4">
+					<div className="flex flex-col items-stretch justify-start space-y-3 h-[45vh] px-2 py-5 overflow-y-auto">
 						{receipes?.map((receipe) => {
 							const { name, id } = receipe;
 							return (
-								<RadioGroup.Option
-									key={id}
-									value={receipe}
-									className={({ active, checked }) => `
-										${active ? "ring-black/80 ring-1" : ""} 
-										${checked ? "bg-black text-white" : "bg-white"} 
-										 bg-white border-black border rounded px-4 py-2 cursor-pointer select-none 
-							}		`}
-								>
-									<div className="flex items-center justify-btween w-full">
-										<RadioGroup.Label as="p" className="font-medium text-sm">
+								<RadioGroup.Option as={Fragment} key={id} value={receipe}>
+									{({ active, checked }) => (
+										<button
+											className={`
+											${checked ? "bg-black text-white" : ""}
+											${active ? "ring-2 ring-black" : ""}
+											ring-1 ring-black font-medium text-sm select-none px-4 py-2 rounded cursor-pointer text-left`}
+										>
 											{name}
-										</RadioGroup.Label>
-									</div>
+										</button>
+									)}
 								</RadioGroup.Option>
 							);
 						})}
@@ -53,7 +50,7 @@ const ReceipesPicker: FC<ReceipesPicker> = ({
 				)}
 			</RadioGroup>
 			{!lastPage && (
-				<div className="">
+				<div className="text-center">
 					<button
 						disabled={loadingNextReceipes}
 						onClick={handleFetchNextReceipes}
